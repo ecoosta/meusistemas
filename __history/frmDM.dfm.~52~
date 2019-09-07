@@ -1,0 +1,185 @@
+object dm: Tdm
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 523
+  Width = 873
+  object Acesso: TZQuery
+    Connection = conexao
+    Active = True
+    SQL.Strings = (
+      'select * from acesso')
+    Params = <>
+    Left = 36
+    Top = 24
+    object Acessoid: TLongWordField
+      FieldName = 'id'
+      Required = True
+    end
+    object AcessoNome: TWideStringField
+      FieldName = 'Nome'
+      Required = True
+      Size = 45
+    end
+    object Acessologin: TWideStringField
+      FieldName = 'login'
+      Required = True
+      Size = 45
+    end
+    object Acessosenha: TWideStringField
+      FieldName = 'senha'
+      Required = True
+      Size = 45
+    end
+    object Acessonivel: TLongWordField
+      FieldName = 'nivel'
+      Required = True
+    end
+    object AcessoULTIMOACESSO: TDateTimeField
+      FieldName = 'ULTIMOACESSO'
+    end
+  end
+  object conexao: TZConnection
+    ControlsCodePage = cCP_UTF16
+    Properties.Strings = (
+      'controls_cp=CP_UTF16'
+      'AutoEncodeStrings=ON')
+    Connected = True
+    HostName = 'localhost'
+    Port = 3306
+    Database = 'newbingo'
+    User = 'root'
+    Password = '102030'
+    Protocol = 'mysql-5'
+    LibraryLocation = 'C:\libares\libmySQL.dll'
+    Left = 320
+    Top = 264
+  end
+  object qrSQL: TZQuery
+    Connection = conexao
+    SQL.Strings = (
+      'SELECT * FROM login')
+    Params = <>
+    Left = 320
+    Top = 312
+  end
+  object qrValidar: TZQuery
+    Connection = conexao
+    SQL.Strings = (
+      'SELECT * FROM vendedor')
+    Params = <>
+    Left = 320
+    Top = 368
+  end
+  object carregarClientes: TZQuery
+    Connection = conexao
+    SQL.Strings = (
+      
+        'SELECT * FROM clientes c INNER JOIN login l ON l.idlogin = c.VEN' +
+        'DEDORID ORDER BY C.VENDEDORID DESC')
+    Params = <>
+    Left = 336
+    Top = 88
+  end
+  object carregarLogin: TZQuery
+    Connection = conexao
+    Active = True
+    SQL.Strings = (
+      'SELECT * FROM login')
+    Params = <>
+    Left = 336
+    Top = 24
+  end
+  object dsAcesso: TDataSource
+    DataSet = Acesso
+    Left = 40
+    Top = 80
+  end
+  object dsClientes: TDataSource
+    DataSet = carregarClientes
+    Left = 408
+    Top = 88
+  end
+  object dsLogin: TDataSource
+    DataSet = carregarLogin
+    Left = 408
+    Top = 24
+  end
+  object arquivoDir: TOpenDialog
+    Filter = 'Arquivo Texto|*.txt|Arquivo CSV|*.csv'
+    Left = 96
+    Top = 24
+  end
+  object qrProcessarArquivo: TZQuery
+    Connection = conexao
+    SQL.Strings = (
+      'SELECT * FROM  t_temp')
+    Params = <>
+    Left = 40
+    Top = 144
+  end
+  object dsProcessoArquivo: TDataSource
+    DataSet = qrProcessarArquivo
+    Left = 136
+    Top = 144
+  end
+  object carregarMilhar: TZQuery
+    Connection = conexao
+    Params = <>
+    Left = 336
+    Top = 144
+  end
+  object dsMilhar: TDataSource
+    DataSet = carregarMilhar
+    Left = 408
+    Top = 144
+  end
+  object conexaoRemoto: TZConnection
+    ControlsCodePage = cCP_UTF16
+    Port = 0
+    Left = 512
+    Top = 32
+  end
+  object consultapremio: TADOQuery
+    CursorType = ctStatic
+    Parameters = <>
+    Left = 704
+    Top = 217
+  end
+  object consultaSQL: TADOQuery
+    CursorType = ctStatic
+    Parameters = <>
+    Left = 640
+    Top = 217
+  end
+  object conexaoAcess: TADOConnection
+    LoginPrompt = False
+    Mode = cmShareDenyNone
+    Provider = 'Microsoft.Jet.OLEDB.4.0'
+    Left = 536
+    Top = 217
+  end
+  object RvProject1: TRvProject
+    ProjectFile = 'C:\bingo_v22\projeto\teste.rav'
+    Left = 520
+    Top = 376
+  end
+  object RvCustomConnection1: TRvCustomConnection
+    RuntimeVisibility = rtDeveloper
+    Left = 592
+    Top = 376
+  end
+  object dsPremios: TDataSource
+    DataSet = carregarPremios
+    Left = 424
+    Top = 200
+  end
+  object carregarPremios: TZQuery
+    Connection = conexao
+    Active = True
+    SQL.Strings = (
+      'SELECT * FROM PREMIOS')
+    Params = <>
+    Left = 336
+    Top = 200
+  end
+end

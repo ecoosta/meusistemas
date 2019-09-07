@@ -1,0 +1,508 @@
+object fPrincipal: TfPrincipal
+  Left = 0
+  Top = 0
+  Cursor = crHandPoint
+  BorderStyle = bsToolWindow
+  Caption = 'SKY PAINEL SISTEMA - PAINEL'
+  ClientHeight = 649
+  ClientWidth = 955
+  Color = clBtnFace
+  DefaultMonitor = dmDesktop
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  Menu = menu
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  OnActivate = FormActivate
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label17: TLabel
+    Left = 800
+    Top = 438
+    Width = 147
+    Height = 13
+    Alignment = taRightJustify
+    BiDiMode = bdLeftToRight
+    Caption = '(00) Vendedores encontrados.'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentBiDiMode = False
+    ParentFont = False
+    Visible = False
+  end
+  object prg: TGauge
+    Left = 0
+    Top = 559
+    Width = 955
+    Height = 23
+    ForeColor = clGreen
+    Progress = 0
+  end
+  object lblRecount: TLabel
+    Left = 770
+    Top = 540
+    Width = 177
+    Height = 13
+    Alignment = taRightJustify
+    Caption = 'Aguarde, Processo em andamento...'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    Visible = False
+  end
+  object Gauge1: TGauge
+    Left = 0
+    Top = 606
+    Width = 955
+    Height = 22
+    Progress = 0
+  end
+  object lblMsg: TLabel
+    Left = 918
+    Top = 587
+    Width = 29
+    Height = 13
+    Alignment = taRightJustify
+    Caption = 'lblMsg'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    Visible = False
+  end
+  object sbPrincipal: TStatusBar
+    Left = 0
+    Top = 628
+    Width = 955
+    Height = 21
+    Panels = <
+      item
+        Text = 'AcessoLogado'
+        Width = 250
+      end
+      item
+        Text = 'Data e Horario'
+        Width = 250
+      end
+      item
+        Text = 'Status do Sistema'
+        Width = 50
+      end>
+  end
+  object gbprocesso: TGroupBox
+    Left = 634
+    Top = 8
+    Width = 313
+    Height = 393
+    TabOrder = 1
+    Visible = False
+    object Label16: TLabel
+      Left = 18
+      Top = 19
+      Width = 135
+      Height = 14
+      Caption = 'Selecione um Vendedor:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
+    object Label15: TLabel
+      Left = 18
+      Top = 114
+      Width = 118
+      Height = 14
+      Caption = 'Selecione um Cliente:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object Label1: TLabel
+      Left = 18
+      Top = 176
+      Width = 85
+      Height = 14
+      Caption = 'Total Escolhida:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object Label2: TLabel
+      Left = 17
+      Top = 224
+      Width = 49
+      Height = 14
+      Caption = 'Quebras:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object TLabel
+      Left = 18
+      Top = 352
+      Width = 3
+      Height = 13
+      Visible = False
+    end
+    object Label4: TLabel
+      Left = 158
+      Top = 223
+      Width = 49
+      Height = 14
+      Caption = 'Quebras:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object btnProcessamento: TButton
+      Left = 18
+      Top = 353
+      Width = 273
+      Height = 31
+      Cursor = crHandPoint
+      Caption = 'Gerar Arquivo'
+      Enabled = False
+      TabOrder = 0
+      Visible = False
+      OnClick = btnProcessamentoClick
+    end
+    object cbVendedoresProcessamento: TComboBox
+      Left = 18
+      Top = 39
+      Width = 273
+      Height = 31
+      Cursor = crHandPoint
+      AutoDropDown = True
+      Style = csDropDownList
+      DoubleBuffered = False
+      DragCursor = crHandPoint
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -19
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentDoubleBuffered = False
+      ParentFont = False
+      TabOrder = 1
+      OnChange = cbVendedoresProcessamentoChange
+    end
+    object cbClientesPrecessamento: TComboBox
+      Left = 18
+      Top = 134
+      Width = 273
+      Height = 31
+      AutoDropDown = True
+      Style = csDropDownList
+      DragCursor = crHandPoint
+      Enabled = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -19
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 2
+      Visible = False
+      OnChange = cbClientesPrecessamentoChange
+    end
+    object txtTotalEscolhida: TEdit
+      Left = 18
+      Top = 196
+      Width = 273
+      Height = 21
+      TabOrder = 3
+      Visible = False
+    end
+    object txtQuebra: TEdit
+      Left = 18
+      Top = 244
+      Width = 135
+      Height = 21
+      TabOrder = 4
+      Visible = False
+    end
+    object btnOrganizaDados: TButton
+      Left = 18
+      Top = 315
+      Width = 273
+      Height = 31
+      Cursor = crHandPoint
+      Caption = 'Organizar Dados'
+      Enabled = False
+      TabOrder = 5
+      Visible = False
+      OnClick = btnOrganizaDadosClick
+    end
+    object gTipo: TGroupBox
+      Left = 18
+      Top = 78
+      Width = 273
+      Height = 30
+      TabOrder = 6
+      Visible = False
+      object rEscolhido: TRadioButton
+        Left = 9
+        Top = 5
+        Width = 97
+        Height = 17
+        Caption = 'Gerar Escolhido'
+        TabOrder = 0
+        OnClick = rEscolhidoClick
+      end
+      object rTodos: TRadioButton
+        Left = 188
+        Top = 5
+        Width = 81
+        Height = 17
+        Caption = 'Gerar Todos'
+        TabOrder = 1
+        OnClick = rTodosClick
+      end
+    end
+    object Button2: TButton
+      Left = 18
+      Top = 279
+      Width = 273
+      Height = 31
+      Cursor = crHandPoint
+      Caption = 'Gerar Quebras'
+      Enabled = False
+      TabOrder = 7
+      Visible = False
+    end
+    object Edit1: TEdit
+      Left = 159
+      Top = 244
+      Width = 128
+      Height = 21
+      TabOrder = 8
+      Visible = False
+    end
+  end
+  object btnF1: TButton
+    Left = 8
+    Top = 20
+    Width = 217
+    Height = 25
+    Cursor = crHandPoint
+    Caption = 'Iniciar Processo Miolo'
+    TabOrder = 2
+    OnClick = btnF1Click
+  end
+  object btnF2: TButton
+    Left = 8
+    Top = 51
+    Width = 217
+    Height = 25
+    Cursor = crHandPoint
+    Caption = 'Iniciar Processo Capa'
+    TabOrder = 3
+    OnClick = btnF2Click
+  end
+  object gbCapas: TGroupBox
+    Left = 312
+    Top = 8
+    Width = 305
+    Height = 393
+    TabOrder = 4
+    Visible = False
+    object Label3: TLabel
+      Left = 15
+      Top = 17
+      Width = 117
+      Height = 14
+      Caption = 'Selecione um cliente:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
+    object Label8: TLabel
+      Left = 21
+      Top = 223
+      Width = 56
+      Height = 16
+      Alignment = taRightJustify
+      Caption = 'lblrecount'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object Gauge2: TGauge
+      Left = 21
+      Top = 245
+      Width = 274
+      Height = 22
+      Progress = 0
+    end
+    object Gauge3: TGauge
+      Left = 21
+      Top = 194
+      Width = 273
+      Height = 23
+      ForeColor = clLime
+      Progress = 0
+    end
+    object Label9: TLabel
+      Left = 258
+      Top = 223
+      Width = 36
+      Height = 16
+      Caption = 'lblMsg'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object btnGerarCapa: TButton
+      Left = 191
+      Top = 94
+      Width = 99
+      Height = 31
+      Cursor = crHandPoint
+      Caption = 'Gerar Arquivo'
+      Enabled = False
+      TabOrder = 0
+      OnClick = btnGerarCapaClick
+    end
+    object cbVendedoresProcessamento2: TComboBox
+      Left = 17
+      Top = 37
+      Width = 273
+      Height = 31
+      AutoDropDown = True
+      Style = csDropDownList
+      DragCursor = crHandPoint
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -19
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 1
+      OnChange = cbVendedoresProcessamento2Change
+    end
+    object cSobras: TCheckBox
+      Left = 17
+      Top = 84
+      Width = 115
+      Height = 17
+      Caption = 'Gerar Capas Avulsa'
+      TabOrder = 2
+    end
+    object btntran: TButton
+      Left = 191
+      Top = 131
+      Width = 99
+      Height = 31
+      Cursor = crHandPoint
+      Caption = 'Transferir Dados'
+      Enabled = False
+      TabOrder = 3
+      Visible = False
+      OnClick = btntranClick
+    end
+  end
+  object txtTabela: TEdit
+    Left = 8
+    Top = 173
+    Width = 163
+    Height = 21
+    TabOrder = 5
+    Text = 'tabela'
+    Visible = False
+  end
+  object F3: TButton
+    Left = 8
+    Top = 82
+    Width = 217
+    Height = 25
+    Cursor = crHandPoint
+    Caption = 'Transferencia de Dados'
+    TabOrder = 6
+    OnClick = F3Click
+  end
+  object Button1: TButton
+    Left = 8
+    Top = 142
+    Width = 217
+    Height = 25
+    Caption = 'teste'
+    TabOrder = 7
+    Visible = False
+    OnClick = Button1Click
+  end
+  object Memo1: TMemo
+    Left = 24
+    Top = 263
+    Width = 147
+    Height = 274
+    Lines.Strings = (
+      'Memo1')
+    TabOrder = 8
+  end
+  object menu: TMainMenu
+    Left = 56
+    Top = 208
+    object Cadastros1: TMenuItem
+      Caption = 'Cadastros'
+      object mcVendedores: TMenuItem
+        Caption = 'Vendedores'
+        OnClick = mcVendedoresClick
+      end
+      object mcClientes: TMenuItem
+        Caption = 'Clientes'
+        OnClick = mcClientesClick
+      end
+      object mcMilhar: TMenuItem
+        Caption = 'Milhar'
+        OnClick = mcMilharClick
+      end
+    end
+    object AreadeImpressao1: TMenuItem
+      Caption = 'Area de Impressao'
+      OnClick = AreadeImpressao1Click
+    end
+  end
+end

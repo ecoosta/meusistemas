@@ -1,0 +1,143 @@
+object fProcessamentoArquivo: TfProcessamentoArquivo
+  Left = 0
+  Top = 0
+  BorderStyle = bsToolWindow
+  Caption = 'Processamento de Dados para impressao'
+  ClientHeight = 410
+  ClientWidth = 646
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  OnActivate = FormActivate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label1: TLabel
+    Left = 8
+    Top = 13
+    Width = 99
+    Height = 13
+    Caption = 'Caminho do arquivo:'
+  end
+  object Gauge1: TGauge
+    Left = 8
+    Top = 374
+    Width = 630
+    Height = 28
+    Progress = 0
+  end
+  object Label2: TLabel
+    Left = 8
+    Top = 355
+    Width = 29
+    Height = 13
+    Caption = 'lblMsg'
+  end
+  object txtArquivoDir: TEdit
+    Left = 8
+    Top = 32
+    Width = 425
+    Height = 24
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    TextHint = 'Caminho do arquivo a processar'
+  end
+  object btnCarregar: TButton
+    Left = 439
+    Top = 32
+    Width = 42
+    Height = 25
+    Cursor = crHandPoint
+    Caption = '...'
+    TabOrder = 1
+    OnClick = btnCarregarClick
+  end
+  object btnProcessar: TButton
+    Left = 487
+    Top = 32
+    Width = 151
+    Height = 25
+    Cursor = crHandPoint
+    Caption = 'Processar Arquivo'
+    TabOrder = 2
+    OnClick = btnProcessarClick
+  end
+  object Memo1: TMemo
+    Left = 8
+    Top = 72
+    Width = 425
+    Height = 277
+    ReadOnly = True
+    TabOrder = 3
+  end
+  object DBGrid1: TDBGrid
+    Left = 8
+    Top = 72
+    Width = 473
+    Height = 277
+    DataSource = dm.dsProcessoArquivo
+    TabOrder = 4
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+    TitleFont.Style = []
+    Columns = <
+      item
+        Alignment = taCenter
+        Expanded = False
+        FieldName = 'ID_TEMP'
+        Title.Caption = 'CONTROLE'
+        Width = 100
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'MILHAR_TEMP'
+        Title.Caption = 'MILHAR'
+        Width = 140
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'CLIENTE_TEMP'
+        Title.Caption = 'CLIENTE'
+        Width = 190
+        Visible = True
+      end>
+  end
+  object btnOr: TButton
+    Left = 487
+    Top = 70
+    Width = 151
+    Height = 25
+    Caption = 'Organizar Arquivo'
+    TabOrder = 5
+    OnClick = btnOrClick
+  end
+  object Edit1: TEdit
+    Left = 8
+    Top = 62
+    Width = 425
+    Height = 24
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 6
+    TextHint = 'Caminho do arquivo a processar'
+  end
+end

@@ -1,0 +1,299 @@
+object fClientes: TfClientes
+  Left = 0
+  Top = 0
+  Cursor = crHandPoint
+  BorderStyle = bsToolWindow
+  Caption = 'Cadastro de Clientes'
+  ClientHeight = 636
+  ClientWidth = 955
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  OnActivate = FormActivate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label2: TLabel
+    Left = 172
+    Top = 29
+    Width = 115
+    Height = 13
+    Caption = '(Vendedor responsavel)'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clRed
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label8: TLabel
+    Left = 25
+    Top = 26
+    Width = 141
+    Height = 16
+    Caption = 'Selecione um Vendedor:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label6: TLabel
+    Left = 25
+    Top = 107
+    Width = 99
+    Height = 16
+    Caption = 'Nome do Cliente:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label7: TLabel
+    Left = 576
+    Top = 107
+    Width = 91
+    Height = 16
+    Caption = 'Total de Milhar:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object cbVendedores: TComboBox
+    Left = 25
+    Top = 48
+    Width = 760
+    Height = 33
+    AutoDropDown = True
+    DragCursor = crHandPoint
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+  end
+  object txtCliente: TEdit
+    Left = 25
+    Top = 129
+    Width = 536
+    Height = 33
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+  end
+  object gClientes: TDBGrid
+    Left = 25
+    Top = 168
+    Width = 760
+    Height = 417
+    DataSource = dsClientes
+    DrawingStyle = gdsGradient
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+    ParentFont = False
+    TabOrder = 2
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+    TitleFont.Style = [fsBold]
+    Columns = <
+      item
+        Alignment = taCenter
+        Expanded = False
+        FieldName = 'IDCLIENTE'
+        Title.Alignment = taCenter
+        Title.Caption = 'ID'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -13
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = [fsBold]
+        Width = 100
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'NOME_CLIENTE'
+        Title.Caption = 'Nome'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -13
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = [fsBold]
+        Width = 360
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'TABELA'
+        Title.Caption = 'Cliente'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -13
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = [fsBold]
+        Width = 175
+        Visible = True
+      end
+      item
+        Alignment = taCenter
+        Expanded = False
+        FieldName = 'TOTAL_MILHAR'
+        Title.Alignment = taCenter
+        Title.Caption = 'T Milhar'
+        Width = 85
+        Visible = True
+      end>
+  end
+  object btnExcluirCliente: TButton
+    Left = 806
+    Top = 130
+    Width = 131
+    Height = 35
+    Cursor = crHandPoint
+    Caption = 'Excluir'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 3
+    OnClick = btnExcluirClienteClick
+  end
+  object btnEditaCliente: TButton
+    Left = 806
+    Top = 89
+    Width = 131
+    Height = 35
+    Cursor = crHandPoint
+    Caption = 'Editar'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 4
+    OnClick = btnEditaClienteClick
+  end
+  object btnNovoCliente: TButton
+    Left = 806
+    Top = 48
+    Width = 131
+    Height = 35
+    Cursor = crHandPoint
+    Caption = 'Novo'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 5
+    OnClick = btnNovoClienteClick
+  end
+  object txtTotalMilhar: TEdit
+    Left = 576
+    Top = 129
+    Width = 209
+    Height = 33
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 6
+  end
+  object btnCancelarCliente: TButton
+    Left = 806
+    Top = 517
+    Width = 131
+    Height = 35
+    Cursor = crHandPoint
+    Caption = 'Cancelar'
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 7
+  end
+  object btnSalvaCliente: TButton
+    Left = 806
+    Top = 558
+    Width = 131
+    Height = 35
+    Cursor = crHandPoint
+    Caption = 'Salvar'
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 8
+    OnClick = btnSalvaClienteClick
+  end
+  object carregarClientes: TZQuery
+    Connection = fPrincipal.conexao
+    Active = True
+    SQL.Strings = (
+      
+        'SELECT * FROM clientes c INNER JOIN login l ON l.idlogin = c.VEN' +
+        'DEDORID ORDER BY C.VENDEDORID DESC')
+    Params = <>
+    Left = 56
+    Top = 392
+  end
+  object dsClientes: TDataSource
+    DataSet = carregarClientes
+    OnDataChange = dsClientesDataChange
+    Left = 56
+    Top = 448
+  end
+  object carregarLogin: TZQuery
+    Connection = fPrincipal.conexao
+    SQL.Strings = (
+      'SELECT * FROM login')
+    Params = <>
+    Left = 56
+    Top = 328
+  end
+  object qrValidar: TZQuery
+    Connection = fPrincipal.conexao
+    SQL.Strings = (
+      'SELECT * FROM vendedor')
+    Params = <>
+    Left = 56
+    Top = 280
+  end
+end

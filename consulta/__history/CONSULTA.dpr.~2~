@@ -1,0 +1,14 @@
+program CONSULTA;
+
+uses
+  Forms,
+  frmConsulta in 'frmConsulta.pas' {fConsulta};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfConsulta, fConsulta);
+  Application.Run;
+end.

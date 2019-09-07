@@ -1,0 +1,782 @@
+unit frmProcessamentoArquivo;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Gauges, Grids, DBGrids, Base, DB, ZAbstractRODataset,
+  ZAbstractDataset, ZDataset;
+
+type
+  TfProcessamentoArquivo = class(TForm)
+    txtArquivoDir: TEdit;
+    Label1: TLabel;
+    btnCarregar: TButton;
+    btnProcessar: TButton;
+    Gauge1: TGauge;
+    Label2: TLabel;
+    Memo1: TMemo;
+    DBGrid1: TDBGrid;
+    btnOr: TButton;
+    cSobras: TCheckBox;
+    txtRegistroPorFolha: TEdit;
+    txtPorFolha: TLabel;
+    cCartela: TRadioButton;
+    cBloquinho: TRadioButton;
+    procedure btnCarregarClick(Sender: TObject);
+    procedure btnProcessarClick(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+    procedure btnOrClick(Sender: TObject);
+    procedure gerarMilhos();
+    procedure gerarCapas();
+    procedure gerarCapasBloquinho();
+    procedure gerarMilhosBloquinho();
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  fProcessamentoArquivo: TfProcessamentoArquivo;
+
+implementation
+
+uses frmPrincipal, frmDM;
+
+{$R *.dfm}
+
+procedure TfProcessamentoArquivo.btnCarregarClick(Sender: TObject);
+var
+aTxt:TextFile;
+quebraLinha,_Lista,_ListaAlterada:TStringList;
+nArq,aArq,caminhoArquivo,_NomeDoArquivo:string;
+linha:string;
+begin
+  if (DM.arquivoDir.Execute = True) then begin
+      txtArquivoDir.Text := DM.arquivoDir.FileName;
+      //ShowMessage(ExtractFileExt(txtArquivoDir.Text));    sxtraindo a extensao do arquivo
+      quebraLinha := TStringList.Create;
+      AssignFile(aTxt, txtArquivoDir.Text);
+      Reset(aTxt);
+      dm.mostrarMensageLabel('Aguarde, importando arquivo txt.', Label2);
+      while not Eoln(aTxt) do begin
+        quebraLinha.Clear;
+        Readln(aTxt, aArq);
+        ExtractStrings([';'],[], pchar(aArq),quebraLinha);
+        linha := quebraLinha.Strings[0];
+        Memo1.Lines.Add(
+          quebraLinha.Strings[0]+';'+
+          quebraLinha.Strings[1]+';'+
+          quebraLinha.Strings[2]
+        );
+      end;
+       dm.mostrarMensageLabel('Fim da importação.', Label2);
+      btnProcessar.Enabled := True;
+  end else begin
+    Application.MessageBox('Nenhum arquivo foi selecionado!', 'SKY PAINEL',MB_OK + MB_ICONWARNING);
+  end;
+end;
+
+procedure TfProcessamentoArquivo.btnOrClick(Sender: TObject);
+var
+aTxt:TextFile;
+quebraLinha,_Lista,_ListaAlterada:TStringList;
+nArq,aArq,caminhoArquivo,_NomeDoArquivo:string;
+linha:string;
+_i:integer;
+begin
+  DBGrid1.Visible := false;
+  //obetemos o caminho do desktop do usuario SO  e o arquivo a ser processado
+  nArq := ExtractFileName(DM.arquivoDir.FileName);
+  caminhoArquivo := 'C:/Users/'+usuarioWindows+'/Desktop/arquivoBingo/processados/'+nArq;
+  //Criamos um String list
+  quebraLinha := TStringList.Create;
+  //Abrimos o arquivo
+  AssignFile(aTxt, caminhoArquivo );
+  Reset(aTxt);
+
+  while not Eoln(aTxt) do begin
+    quebraLinha.Clear;
+    Readln(aTxt, aArq);
+    ExtractStrings([';'],[], pchar(aArq),quebraLinha);
+    linha := quebraLinha.Strings[0];
+
+    if (linha = 'XXXX.XXXX') OR (linha = '') then begin
+       break;
+    end;
+    Memo1.Lines.Add(
+                    quebraLinha.Strings[0]+';'+
+                    quebraLinha.Strings[1]+';'+
+                    quebraLinha.Strings[2]+';'+
+                    quebraLinha.Strings[3]+';'+
+                    quebraLinha.Strings[4]+';'+
+                    quebraLinha.Strings[5]+';'+
+                    quebraLinha.Strings[6]+';'+
+                    quebraLinha.Strings[7]+';'
+                    );
+  end;
+  CloseFile(aTxt);
+
+  Memo1.Lines.SaveToFile(caminhoArquivo);
+end;
+
+procedure TfProcessamentoArquivo.btnProcessarClick(Sender: TObject);
+begin
+
+    Gauge1.Progress := 0;
+    if ((txtRegistroPorFolha.Text = '')) then begin
+        Application.MessageBox('Informe a quantidade de Registro que tera por folha!','SKY PAINEL', MB_OK + MB_ICONWARNING);
+        txtRegistroPorFolha.SetFocus;
+        abort;
+     end;
+
+    if ((cBloquinho.Checked = false) and (cCartela.Checked = false)) then begin
+        Application.MessageBox('Escolha o tipo de cartela a ser processadas!','SKY PAINEL', MB_OK + MB_ICONWARNING);
+        abort;
+     end;
+
+
+     if (cBloquinho.Checked = True) then begin
+       if cSobras.Checked = True then begin
+         gerarCapasBloquinho();
+       end else begin
+         gerarMilhosBloquinho();
+       end;
+     end else  begin
+       if cSobras.Checked = True then begin
+         gerarCapas();
+       end else begin
+         gerarMilhos();
+       end;
+     end;
+end;
+
+procedure TfProcessamentoArquivo.FormActivate(Sender: TObject);
+begin
+  DM.qrProcessarArquivo.Active := true;
+end;
+
+procedure TfProcessamentoArquivo.gerarCapas;
+var
+aTxt:TextFile;
+quebraLinha:TStringList;
+nArq,caminhoArquivo,linha,aArq,caminhoArquivoNovo:string;
+qrTemp,tempSQL:Tzquery;
+
+i, j: integer;
+nTal, nCab, nNum, nPrf, nIni, nLot, nSoma,nSomaNprf: LongInt;
+begin
+    ExcultSQL('TRUNCATE TABLE temp_capas'); // limpa a tabela controle
+
+    quebraLinha := TStringList.Create;
+    AssignFile(aTxt, txtArquivoDir.Text);
+    Reset(aTxt);
+
+    Gauge1.Progress := 0;
+  Gauge1.MaxValue := Memo1.Lines.Count;
+  Memo1.Clear;
+
+
+  while not Eoln(aTxt) do begin
+     quebraLinha.Clear;
+     Readln(aTxt, nArq);
+     ExtractStrings([';'],[], pchar(nArq),quebraLinha);
+     with DM.qrProcessarArquivo do begin
+      SQL.Clear;
+       close;
+       SQL.Add('INSERT INTO temp_capas (CINI, CFIM, CLIENTEID,TOTAL)');
+       SQL.Add('VALUES(:CINI, :CFIM, :CLIENTEID,:TOTAL)');
+       ParamByName('CINI').AsString :=  quebraLinha.Strings[0];
+       ParamByName('CFIM').AsString := quebraLinha.Strings[1];
+       ParamByName('CLIENTEID').AsString := quebraLinha.Strings[2];
+       ParamByName('TOTAL').AsString := quebraLinha.Strings[3];
+       ExecSQL;
+     end;
+     Gauge1.Progress := Gauge1.Progress + 1;
+  end;
+  CloseFile(aTxt);
+
+  qrTemp := TZQuery.Create(nil);
+  tempSQL := TZQuery.Create(nil);
+
+  with qrTemp do
+  begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM temp_capas');
+    Open;
+  end;
+
+  caminhoArquivo := 'PDF/producao/';
+  nArq := ExtractFileName(DM.arquivoDir.FileName);
+  // criar o diretorio para guarda o banco txt, se ja existe o caminho ele nao criar
+  if not DirectoryExists(caminhoArquivo) then
+  begin
+    CreateDir(caminhoArquivo);
+  end;
+
+//  if not DirectoryExists(caminhoArquivo+'arquivoBingo\processados\') then
+//  begin
+//    CreateDir(caminhoArquivo+'arquivoBingo/processados/');
+//  end;
+
+  caminhoArquivoNovo := caminhoArquivo+'/'+nArq;
+
+  AssignFile(aTxt, caminhoArquivoNovo);
+  Rewrite(aTxt);
+
+  nLot := qrTemp.RecordCount; // total de registros
+  nPrf := 1; // profundidade
+
+  // validamos se o numero e 1 ou 0
+  if (CacularArredodamento(nLot) > StrToBool('0')) then
+  begin
+    nSoma := (nLot div StrToInt('4')) div nPrf;// 9800 / 4 / 100 = 25
+  end
+  else
+  begin
+    nSoma := (nLot div StrToInt('4')) div nPrf + 1;// 2800 / 4 / 100 + 1 = 26
+  end;
+
+  Gauge1.MaxValue := nSoma;
+
+  for nTal := 0 to nSoma do
+  begin
+    nIni := (nTal * nPrf * StrToInt('4'));
+
+    for i := 1 to nPrf do
+    begin
+
+      for j := 0 to StrToInt('4') - 1 do
+      begin
+        nNum := (j * nPrf) + nIni + i; // PECORRE O ID DOS DADOS // 0 * 100 + 0 + 0 = 0 #1 passada
+        with tempSQL do
+        begin
+          Connection := DM.conexao;
+          Connection.Connect;
+          SQL.Clear;
+          Close;
+          SQL.Add('SELECT * FROM temp_capas WHERE ID = "' + IntToStr(nNum) + '"');
+          Open;
+        end;
+        if tempSQL.RecordCount > 0 then
+        begin
+          Write(aTxt,
+              tempSQL.FieldByName('CINI').AsString+';' +
+              tempSQL.FieldByName('CFIM').AsString+';' +
+              tempSQL.FieldByName('CLIENTEID').AsString+';' +
+              tempSQL.FieldByName('TOTAL').AsString+';'
+              );
+        end;
+
+        if (nNum > nLot) then
+        begin
+          write(aTxt, 'XXXX;XXXX;XXXX;XXXX;'); // completamos onde for vazios
+        end;
+      end;
+      WriteLn(aTxt, ''); // pula para linha de baixo
+    end;
+    Gauge1.Progress := Gauge1.Progress + 1;
+  end;
+  CloseFile(aTxt);
+
+  Label1.Caption := 'Aguarde, Organizando arquivo de impressão';
+  Sleep(500);
+  AssignFile(aTxt, caminhoArquivoNovo);
+  Reset(aTxt);
+
+  while not Eoln(aTxt) do begin
+    quebraLinha.Clear;
+    Readln(aTxt, aArq);
+    ExtractStrings([';'],[], pchar(aArq),quebraLinha);
+    linha := quebraLinha.Strings[0];
+
+    if (linha = 'XXXX') OR (linha = '') then begin
+       break;
+    end;
+    Memo1.Lines.Add(
+                      quebraLinha.Strings[0]+';'+
+                      quebraLinha.Strings[1]+';'+
+                      quebraLinha.Strings[2]+';'+
+                      quebraLinha.Strings[3]+';'+
+                      quebraLinha.Strings[4]+';'+
+                      quebraLinha.Strings[5]+';'+
+                      quebraLinha.Strings[6]+';'+
+                      quebraLinha.Strings[7]+';'+
+                      quebraLinha.Strings[8]+';'+
+                      quebraLinha.Strings[9]+';'+
+                      quebraLinha.Strings[10]+';'+
+                      quebraLinha.Strings[11]+';'+
+                      quebraLinha.Strings[12]+';'+
+                      quebraLinha.Strings[13]+';'+
+                      quebraLinha.Strings[14]+';'+
+                      quebraLinha.Strings[15]+';'
+                    );
+  end;
+  CloseFile(aTxt);
+
+  Memo1.Lines.SaveToFile(caminhoArquivoNovo);
+  with qrTemp do begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM t_temp');
+    Open;
+  end;
+
+  dm.dsProcessoArquivo.DataSet := qrTemp;
+  DBGrid1.DataSource := dm.dsProcessoArquivo;
+  Application.MessageBox('Fim de processo!', 'SKY PAINEL',MB_OK + MB_ICONWARNING);
+end;
+
+procedure TfProcessamentoArquivo.gerarCapasBloquinho;
+var
+aTxt:TextFile;
+quebraLinha:TStringList;
+nArq,caminhoArquivo,linha,aArq,caminhoArquivoNovo:string;
+qrTemp,tempSQL:Tzquery;
+i, j, tTotalRegistro: integer;
+nTal, nCab, nNum, nPrf, nIni, nLot, nSoma,nSomaNprf,tInicial: LongInt;
+begin
+
+  Label2.Caption := 'Aguarde, Processando arquivo de spool.';
+
+  qrTemp := TZQuery.Create(nil);
+  tempSQL := TZQuery.Create(nil);
+
+  with qrTemp do
+  begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM t_temp');
+    Open;
+  end;
+
+  caminhoArquivo := 'PDF/producao/';
+  nArq := ExtractFileName(DM.arquivoDir.FileName);
+  // criar o diretorio para guarda o banco txt, se ja existe o caminho ele nao criar
+  if not DirectoryExists(caminhoArquivo) then
+  begin
+    CreateDir(caminhoArquivo);
+  end;
+
+//  if not DirectoryExists(caminhoArquivo+'arquivoBingo\processados\') then
+//  begin
+//    CreateDir(caminhoArquivo+'arquivoBingo/processados/');
+//  end;
+
+  caminhoArquivoNovo := caminhoArquivo+'/capa_'+nArq;
+
+  AssignFile(aTxt, caminhoArquivoNovo);
+  Rewrite(aTxt);
+
+  nLot := qrTemp.RecordCount; // total de registros
+  nPrf := 1; // profundidade
+
+  // validamos se o numero e 1 ou 0
+  if (CacularArredodamento(nLot) > StrToBool('0')) then begin
+    nSoma := (nLot div StrToInt(txtRegistroPorFolha.Text)) div nPrf;// 9800 / 4 / 100 = 25
+  end else begin
+    nSoma := (nLot div StrToInt(txtRegistroPorFolha.Text)) div nPrf + 1;// 2800 / 4 / 100 + 1 = 26
+  end;
+
+  Gauge1.MaxValue := nSoma;
+
+  for nTal := 0 to nSoma do begin
+    nIni := (nTal * nPrf * StrToInt(txtRegistroPorFolha.Text));
+
+    for i := 1 to nPrf do begin
+
+      for j := 0 to StrToInt(txtRegistroPorFolha.Text) - 1 do begin
+        nNum := (j * nPrf) + nIni + i; // PECORRE O ID DOS DADOS // 0 * 100 + 0 + 0 = 0 #1 passada
+        with tempSQL do begin
+          Connection := DM.conexao;
+          Connection.Connect;
+          SQL.Clear;
+          Close;
+          SQL.Add('SELECT * FROM t_temp WHERE ID = "' + IntToStr(nNum) + '"');
+          Open;
+        end;
+        if tempSQL.RecordCount > 0 then begin
+          Write(aTxt,
+              FormatFloat('0000',StrToInt(tempSQL.FieldByName('MILHAR_TEMP').AsString)) + ';' +
+              'BLOCO_'+tempSQL.FieldByName('lote').AsString+ ';'
+              );
+        end;
+
+        if (nNum > nLot) then begin
+          write(aTxt, 'xxxx.xxxx;xxxx;BLOCO_xxx;'); // completamos onde for vazios
+        end;
+
+      end;
+      WriteLn(aTxt, ''); // pula para linha de baixo
+    end;
+    Gauge1.Progress := Gauge1.Progress + 1;
+  end;
+  CloseFile(aTxt);
+
+  Label1.Caption := 'Aguarde, Organizando arquivo de impressão';
+  Sleep(500);
+
+  with qrTemp do begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM t_temp');
+    Open;
+  end;
+
+  dm.dsProcessoArquivo.DataSet := qrTemp;
+  DBGrid1.DataSource := dm.dsProcessoArquivo;
+  Application.MessageBox('Fim de processo!', 'SKY PAINEL',MB_OK + MB_ICONWARNING);
+end;
+
+procedure TfProcessamentoArquivo.gerarMilhos;
+var
+aTxt:TextFile;
+quebraLinha:TStringList;
+nArq,caminhoArquivo,linha,aArq,caminhoArquivoNovo:string;
+qrTemp,tempSQL:Tzquery;
+i, j: integer;
+nTal, nCab, nNum, nPrf, nIni, nLot, nSoma,nSomaNprf: LongInt;
+begin
+  ExcultSQL('TRUNCATE TABLE t_temp'); // limpa a tabela controle
+
+  quebraLinha := TStringList.Create;
+  AssignFile(aTxt, txtArquivoDir.Text);
+  Reset(aTxt);
+
+  Gauge1.Progress := 0;
+  Gauge1.MaxValue := Memo1.Lines.Count;
+  Memo1.Clear;
+
+  dm.mostrarMensageLabel('Aguarde, importando dados',Label2);
+  while not Eoln(aTxt) do begin
+     quebraLinha.Clear;
+     Readln(aTxt, nArq);
+     ExtractStrings([';'],[], pchar(nArq),quebraLinha);
+     with DM.qrProcessarArquivo do begin
+      SQL.Clear;
+       close;
+       SQL.Add('INSERT INTO t_temp (ID_TEMP, MILHAR_TEMP, CLIENTE_TEMP)');
+       SQL.Add('VALUES(:IDT, :MIT, :CLT)');
+       ParamByName('IDT').AsString :=  quebraLinha.Strings[0];
+       ParamByName('MIT').AsString := quebraLinha.Strings[1];
+       ParamByName('CLT').AsString := quebraLinha.Strings[2];
+       ExecSQL;
+     end;
+     Gauge1.Progress := Gauge1.Progress + 1;
+  end;
+  CloseFile(aTxt);
+
+  qrTemp := TZQuery.Create(nil);
+  tempSQL := TZQuery.Create(nil);
+
+  with qrTemp do
+  begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM t_temp');
+    Open;
+  end;
+
+  caminhoArquivo := 'PDF/producao/';
+  nArq := ExtractFileName(DM.arquivoDir.FileName);
+  // criar o diretorio para guarda o banco txt, se ja existe o caminho ele nao criar
+  if not DirectoryExists(caminhoArquivo) then
+  begin
+    CreateDir(caminhoArquivo);
+  end;
+
+//  if not DirectoryExists(caminhoArquivo+'arquivoBingo\processados\') then
+//  begin
+//    CreateDir(caminhoArquivo+'arquivoBingo/processados/');
+//  end;
+
+  caminhoArquivoNovo := caminhoArquivo+'/'+nArq;
+
+  AssignFile(aTxt, caminhoArquivoNovo);
+  Rewrite(aTxt);
+
+  nLot := qrTemp.RecordCount; // total de registros
+
+  if nLot < 100 then begin
+      if (CacularArredodamento(nLot) > StrToBool('0')) then  begin
+        nSomaNprf := (nLot div StrToInt(txtRegistroPorFolha.Text));
+      end else begin
+        nSomaNprf := (nLot div StrToInt(txtRegistroPorFolha.Text)) + 1;
+      end;
+      nSomaNprf := nSomaNprf;
+  end else begin
+     nSomaNprf := 100;
+  end;
+
+  nPrf := nSomaNprf; // profundidade
+
+  // validamos se o numero e 1 ou 0
+  if (CacularArredodamento(nLot) > StrToBool('0')) then
+  begin
+    nSoma := (nLot div StrToInt(txtRegistroPorFolha.Text)) div nPrf;// 9800 / 4 / 100 = 25
+  end
+  else
+  begin
+    nSoma := (nLot div StrToInt(txtRegistroPorFolha.Text)) div nPrf + 1;// 2800 / 4 / 100 + 1 = 26
+  end;
+
+  Gauge1.MaxValue := nSoma;
+
+  for nTal := 0 to nSoma do
+  begin
+    nIni := (nTal * nPrf * StrToInt(txtRegistroPorFolha.Text));
+
+    for i := 1 to nPrf do
+    begin
+
+      for j := 0 to StrToInt(txtRegistroPorFolha.Text) - 1 do
+      begin
+        nNum := (j * nPrf) + nIni + i; // PECORRE O ID DOS DADOS // 0 * 100 + 0 + 0 = 0 #1 passada
+        with tempSQL do
+        begin
+          Connection := DM.conexao;
+          Connection.Connect;
+          SQL.Clear;
+          Close;
+          SQL.Add('SELECT * FROM t_temp WHERE ID = "' + IntToStr(nNum) + '"');
+          Open;
+        end;
+        if tempSQL.RecordCount > 0 then
+        begin
+          Write(aTxt,
+              FormatFloat('0000', StrToInt(tempSQL.FieldByName('ID_TEMP').AsString))+ '.0000;' +
+              FormatFloat('0000',StrToInt(tempSQL.FieldByName('MILHAR_TEMP').AsString)) + ';'
+              );
+        end;
+
+        if (nNum > nLot) then
+        begin
+          write(aTxt, 'XXXX.XXXX;XXXX;'); // completamos onde for vazios
+        end;
+      end;
+      WriteLn(aTxt, ''); // pula para linha de baixo
+    end;
+    Gauge1.Progress := Gauge1.Progress + 1;
+  end;
+  CloseFile(aTxt);
+
+  Label1.Caption := 'Aguarde, Organizando arquivo de impressão';
+  Sleep(500);
+  AssignFile(aTxt, caminhoArquivoNovo);
+  Reset(aTxt);
+
+  while not Eoln(aTxt) do begin
+    quebraLinha.Clear;
+    Readln(aTxt, aArq);
+    ExtractStrings([';'],[], pchar(aArq),quebraLinha);
+    linha := quebraLinha.Strings[0];
+
+    if (linha = 'XXXX.XXXX') OR (linha = '') then begin
+       break;
+    end;
+    Memo1.Lines.Add(
+                      quebraLinha.Strings[0]+';'+
+                      quebraLinha.Strings[1]+';'+
+                      quebraLinha.Strings[2]+';'+
+                      quebraLinha.Strings[3]+';'+
+                      quebraLinha.Strings[4]+';'+
+                      quebraLinha.Strings[5]+';'+
+                      quebraLinha.Strings[6]+';'+
+                      quebraLinha.Strings[7]+';'
+                    );
+  end;
+  CloseFile(aTxt);
+
+  Memo1.Lines.SaveToFile(caminhoArquivoNovo);
+  with qrTemp do begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM t_temp');
+    Open;
+  end;
+
+  dm.dsProcessoArquivo.DataSet := qrTemp;
+  DBGrid1.DataSource := dm.dsProcessoArquivo;
+  Application.MessageBox('Fim de processo!', 'SKY PAINEL',MB_OK + MB_ICONWARNING);
+end;
+
+procedure TfProcessamentoArquivo.gerarMilhosBloquinho;
+var
+aTxt:TextFile;
+quebraLinha:TStringList;
+nArq,caminhoArquivo,linha,aArq,caminhoArquivoNovo:string;
+qrTemp,tempSQL:Tzquery;
+i, j, tTotalRegistro: integer;
+nTal, nCab, nNum, nPrf, nIni, nLot, nSoma,nSomaNprf,tInicial: LongInt;
+begin
+  ExcultSQL('TRUNCATE TABLE t_temp'); // limpa a tabela controle
+
+  quebraLinha := TStringList.Create;
+  AssignFile(aTxt, txtArquivoDir.Text);
+  Reset(aTxt);
+
+  Gauge1.Progress := 0;
+  Gauge1.MaxValue := Memo1.Lines.Count;
+  Memo1.Clear;
+
+  Label2.Caption := 'Aguarde, lendo arquivo e importando!';
+  Label2.Update;
+  Label2.Refresh;
+
+  while not Eoln(aTxt) do begin
+     quebraLinha.Clear;
+     Readln(aTxt, nArq);
+     ExtractStrings([';'],[], pchar(nArq),quebraLinha);
+     with DM.qrProcessarArquivo do begin
+      SQL.Clear;
+       close;
+       SQL.Add('INSERT INTO t_temp (ID_TEMP, MILHAR_TEMP, CLIENTE_TEMP)');
+       SQL.Add('VALUES(:IDT, :MIT, :CLT)');
+       ParamByName('IDT').AsString :=  quebraLinha.Strings[0];
+       ParamByName('MIT').AsString := quebraLinha.Strings[1];
+       ParamByName('CLT').AsString := quebraLinha.Strings[2];
+       ExecSQL;
+     end;
+     Gauge1.Progress := Gauge1.Progress + 1;
+  end;
+  CloseFile(aTxt);
+
+  Label2.Caption := 'Aguarde, Processando lotes';
+  Label2.Update;
+  Label2.Refresh;
+  DM.qrProcessarArquivo.Close;
+  tInicial := 1;
+  for i := 1 to 300 do
+  begin
+    for tTotalRegistro := 1 to 4 do
+    begin
+    with dm do begin
+       with qrProcessarArquivo do begin
+          SQL.Clear;
+          Close;
+          SQL.Add('UPDATE t_temp SET lote = :lote WHERE  ID >= :ID1 AND ID <= :ID2 ');
+          ParamByName('lote').AsString :=IntToStr( i );
+          ParamByName('ID1').AsString := IntToStr(tInicial);
+          ParamByName('ID2').AsString := IntToStr(i * 4);
+          ExecSQL
+       end;
+    end;
+    end;
+    tInicial := i * 4 + 1;
+    Continue;
+  end;
+
+  Label2.Caption := 'Aguarde, Processando arquivo de spool.';
+    Label2.Update;
+  Label2.Refresh;
+  qrTemp := TZQuery.Create(nil);
+  tempSQL := TZQuery.Create(nil);
+
+  with qrTemp do
+  begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM t_temp');
+    Open;
+  end;
+
+  caminhoArquivo := 'PDF/producao/';
+  nArq := ExtractFileName(DM.arquivoDir.FileName);
+  // criar o diretorio para guarda o banco txt, se ja existe o caminho ele nao criar
+  if not DirectoryExists(caminhoArquivo) then
+  begin
+    CreateDir(caminhoArquivo);
+  end;
+
+//  if not DirectoryExists(caminhoArquivo+'arquivoBingo\processados\') then
+//  begin
+//    CreateDir(caminhoArquivo+'arquivoBingo/processados/');
+//  end;
+
+  caminhoArquivoNovo := caminhoArquivo+'/'+nArq;
+
+  AssignFile(aTxt, caminhoArquivoNovo);
+  Rewrite(aTxt);
+
+  nLot := qrTemp.RecordCount; // total de registros
+  nPrf := StrToInt(txtRegistroPorFolha.Text); // profundidade
+
+  // validamos se o numero e 1 ou 0
+  if (CacularArredodamento(nLot) > StrToBool('0')) then begin
+    nSoma := (nLot div StrToInt(txtRegistroPorFolha.Text)) div nPrf;// 9800 / 4 / 100 = 25
+  end else begin
+    nSoma := (nLot div StrToInt(txtRegistroPorFolha.Text)) div nPrf + 1;// 2800 / 4 / 100 + 1 = 26
+  end;
+
+  Gauge1.MaxValue := nSoma;
+
+  for nTal := 0 to nSoma do begin
+    nIni := (nTal * nPrf * StrToInt(txtRegistroPorFolha.Text));
+
+    for i := 1 to nPrf do begin
+
+      for j := 0 to StrToInt(txtRegistroPorFolha.Text) - 1 do begin
+        nNum := (j * nPrf) + nIni + i; // PECORRE O ID DOS DADOS // 0 * 100 + 0 + 0 = 0 #1 passada
+        with tempSQL do begin
+          Connection := DM.conexao;
+          Connection.Connect;
+          SQL.Clear;
+          Close;
+          SQL.Add('SELECT * FROM t_temp WHERE ID = "' + IntToStr(nNum) + '"');
+          Open;
+        end;
+        if tempSQL.RecordCount > 0 then begin
+          Write(aTxt,
+              FormatFloat('0000', StrToInt(tempSQL.FieldByName('ID_TEMP').AsString))+ '.0000;' +
+              FormatFloat('0000',StrToInt(tempSQL.FieldByName('MILHAR_TEMP').AsString)) + ';' +
+              'BLOCO_'+tempSQL.FieldByName('lote').AsString+ ';'
+              );
+        end;
+
+        if (nNum > nLot) then begin
+          write(aTxt, 'xxxx.xxxx;xxxx;BLOCO_xxx;'); // completamos onde for vazios
+        end;
+
+      end;
+      WriteLn(aTxt, ''); // pula para linha de baixo
+    end;
+    Gauge1.Progress := Gauge1.Progress + 1;
+  end;
+  CloseFile(aTxt);
+
+  Label1.Caption := 'Aguarde, Organizando arquivo de impressão';
+    Label2.Update;
+  Label2.Refresh;
+  Sleep(500);
+
+  with qrTemp do begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM t_temp');
+    Open;
+  end;
+
+  dm.dsProcessoArquivo.DataSet := qrTemp;
+  DBGrid1.DataSource := dm.dsProcessoArquivo;
+  Application.MessageBox('Fim de processo!', 'SKY PAINEL',MB_OK + MB_ICONWARNING);
+end;
+
+end.

@@ -1,0 +1,425 @@
+object fMilhar: TfMilhar
+  Left = 0
+  Top = 0
+  BorderStyle = bsToolWindow
+  Caption = 'Cadastrar Milhar'
+  ClientHeight = 546
+  ClientWidth = 955
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  OnActivate = FormActivate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label9: TLabel
+    Left = 14
+    Top = 8
+    Width = 135
+    Height = 14
+    Caption = 'Selecione um Vendedor:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label10: TLabel
+    Left = 14
+    Top = 69
+    Width = 118
+    Height = 14
+    Caption = 'Selecione um Cliente:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label1: TLabel
+    Left = 440
+    Top = 512
+    Width = 37
+    Height = 16
+    Caption = 'Label1'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    Visible = False
+  end
+  object Gauge1: TGauge
+    Left = 14
+    Top = 331
+    Width = 396
+    Height = 30
+    Progress = 0
+    Visible = False
+  end
+  object cbVendedoresM: TComboBox
+    Left = 14
+    Top = 26
+    Width = 396
+    Height = 31
+    AutoDropDown = True
+    Style = csDropDownList
+    DragCursor = crHandPoint
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    OnChange = cbVendedoresMChange
+  end
+  object cbClientesM: TComboBox
+    Left = 14
+    Top = 89
+    Width = 396
+    Height = 31
+    AutoDropDown = True
+    Style = csDropDownList
+    DragCursor = crHandPoint
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+    OnChange = cbClientesMChange
+  end
+  object txtTabela: TEdit
+    Left = 766
+    Top = 512
+    Width = 163
+    Height = 21
+    TabOrder = 2
+    Text = 'tabela'
+    Visible = False
+  end
+  object gMilhar: TDBGrid
+    Left = 440
+    Top = 134
+    Width = 489
+    Height = 372
+    DrawingStyle = gdsGradient
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+    ParentFont = False
+    TabOrder = 3
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+    TitleFont.Style = []
+    Columns = <
+      item
+        Alignment = taCenter
+        Expanded = False
+        FieldName = 'ID'
+        Title.Alignment = taCenter
+        Title.Caption = 'CONTROLE'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -13
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
+        Width = 80
+        Visible = True
+      end
+      item
+        Alignment = taCenter
+        Expanded = False
+        FieldName = 'MILHAR'
+        Title.Alignment = taCenter
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -13
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
+        Width = 120
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'NOME_CLIENTE'
+        Title.Caption = 'NOME DO VENDEDOR'
+        Title.Font.Charset = DEFAULT_CHARSET
+        Title.Font.Color = clWindowText
+        Title.Font.Height = -13
+        Title.Font.Name = 'Tahoma'
+        Title.Font.Style = []
+        Width = 270
+        Visible = True
+      end>
+  end
+  object gTipo: TGroupBox
+    Left = 14
+    Top = 138
+    Width = 396
+    Height = 30
+    TabOrder = 4
+    Visible = False
+    object rIncluir: TRadioButton
+      Left = 14
+      Top = 6
+      Width = 67
+      Height = 17
+      BiDiMode = bdLeftToRight
+      Caption = 'Adicionar'
+      ParentBiDiMode = False
+      TabOrder = 0
+      OnClick = rIncluirClick
+    end
+    object rExcluir: TRadioButton
+      Left = 123
+      Top = 6
+      Width = 54
+      Height = 17
+      Caption = 'Excluir'
+      TabOrder = 1
+      OnClick = rExcluirClick
+    end
+  end
+  object grMilhar: TGroupBox
+    Left = 14
+    Top = 220
+    Width = 396
+    Height = 105
+    TabOrder = 5
+    Visible = False
+    object lblMilharMSG: TLabel
+      Left = 14
+      Top = 78
+      Width = 270
+      Height = 19
+      Caption = 'Milhar (0000) cadastrada com sucesso'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGreen
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object Label12: TLabel
+      Left = 14
+      Top = 9
+      Width = 40
+      Height = 16
+      Caption = 'Milhar:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
+    object Label14: TLabel
+      Left = 231
+      Top = 9
+      Width = 73
+      Height = 16
+      Caption = 'Total Milhar:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object txtMilhar: TEdit
+      Left = 14
+      Top = 31
+      Width = 363
+      Height = 33
+      Enabled = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -21
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      MaxLength = 4
+      ParentFont = False
+      TabOrder = 0
+      OnChange = txtMilharChange
+      OnKeyPress = txtMilharKeyPress
+    end
+    object txtTMilhar: TEdit
+      Left = 288
+      Top = 31
+      Width = 89
+      Height = 33
+      Enabled = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -21
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      MaxLength = 4
+      ParentFont = False
+      TabOrder = 1
+      Visible = False
+    end
+  end
+  object btnImprimr: TButton
+    Left = 14
+    Top = 468
+    Width = 163
+    Height = 38
+    Caption = 'Imprimir Relatorio'
+    Enabled = False
+    TabOrder = 6
+    OnClick = btnImprimrClick
+  end
+  object grTotal: TGroupBox
+    Left = 509
+    Top = 220
+    Width = 396
+    Height = 105
+    TabOrder = 7
+    Visible = False
+    object Label2: TLabel
+      Left = 14
+      Top = 78
+      Width = 270
+      Height = 19
+      Caption = 'Milhar (0000) cadastrada com sucesso'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clGreen
+      Font.Height = -16
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+      Visible = False
+    end
+    object Label3: TLabel
+      Left = 14
+      Top = 9
+      Width = 94
+      Height = 16
+      Caption = 'Informe o Total:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
+    object txtTotalMilharSortida: TEdit
+      Left = 14
+      Top = 31
+      Width = 363
+      Height = 33
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -21
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      MaxLength = 4
+      ParentFont = False
+      TabOrder = 0
+      OnChange = txtTotalMilharSortidaChange
+      OnKeyPress = txtTotalMilharSortidaKeyPress
+    end
+  end
+  object gTipo2: TGroupBox
+    Left = 14
+    Top = 174
+    Width = 396
+    Height = 30
+    TabOrder = 8
+    Visible = False
+    object RadioButton1: TRadioButton
+      Left = 14
+      Top = 6
+      Width = 83
+      Height = 17
+      BiDiMode = bdLeftToRight
+      Caption = 'Digitar Milhar'
+      Checked = True
+      ParentBiDiMode = False
+      TabOrder = 0
+      TabStop = True
+      OnClick = rIncluirClick
+    end
+    object RadioButton2: TRadioButton
+      Left = 123
+      Top = 6
+      Width = 86
+      Height = 17
+      Caption = 'Pega Sortida'
+      TabOrder = 1
+      OnClick = RadioButton2Click
+    end
+    object cTodas: TCheckBox
+      Left = 288
+      Top = 6
+      Width = 57
+      Height = 17
+      Caption = 'Todas'
+      TabOrder = 2
+      Visible = False
+    end
+  end
+  object gPremios: TDBGrid
+    Left = 440
+    Top = 8
+    Width = 489
+    Height = 120
+    DataSource = dm.dsPremios
+    DrawingStyle = gdsGradient
+    Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+    TabOrder = 9
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+    TitleFont.Style = []
+    OnDblClick = gPremiosDblClick
+    Columns = <
+      item
+        Expanded = False
+        FieldName = 'ID'
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'PREMIO'
+        Width = 250
+        Visible = True
+      end
+      item
+        Expanded = False
+        FieldName = 'DATASORTEIO'
+        Title.Alignment = taCenter
+        Title.Caption = 'DATA SORTEIO'
+        Width = 140
+        Visible = True
+      end>
+  end
+  object carregarLoginCB: TZQuery
+    Connection = dm.conexao
+    SQL.Strings = (
+      'SELECT * FROM login')
+    Params = <>
+    Left = 672
+    Top = 240
+  end
+end

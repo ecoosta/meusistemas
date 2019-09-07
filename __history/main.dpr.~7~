@@ -1,0 +1,27 @@
+program main;
+
+uses
+  Forms,
+  SysUtils,
+  windows,
+  frmPrincipal in 'frmPrincipal.pas' { fPrincipal } ,
+  frmLogin in 'frmLogin.pas' { fLogin } ,
+  frmClientes in 'frmClientes.pas' { fClientes } ,
+  frmMilhar in 'frmMilhar.pas' { fMilhar } ,
+  frmVendedores in 'frmVendedores.pas' { fVendedores } ,
+  frmProcessamentoArquivo in 'frmProcessamentoArquivo.pas'{ fProcessamentoArquivo } ,
+  frmDM in 'frmDM.pas' { dm: TDataModule } ;
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TfPrincipal, fPrincipal);
+  Application.CreateForm(TfLogin, fLogin);
+  Application.CreateForm(TfProcessamentoArquivo, fProcessamentoArquivo);
+  Application.CreateForm(Tdm, dm);
+  Application.CreateForm(TfClientes, fClientes);
+  Application.CreateForm(TfMilhar, fMilhar);
+  Application.CreateForm(TfVendedores, fVendedores);
+  Application.Run;
+end.

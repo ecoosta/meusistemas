@@ -1,0 +1,36 @@
+program main;
+
+uses
+  Forms,
+  SysUtils,
+  windows,
+  frmDM in 'frmDM.pas' { dm: TDataModule },
+  frmPrincipal in 'frmPrincipal.pas' { fPrincipal },
+  frmLogin in 'frmLogin.pas' { fLogin },
+  frmClientes in 'frmClientes.pas' { fClientes },
+  frmMilhar in 'frmMilhar.pas' { fMilhar },
+  frmVendedores in 'frmVendedores.pas' { fVendedores },
+  frmProcessamentoArquivo in 'frmProcessamentoArquivo.pas' { fProcessamentoArquivo },
+  frmAtualizarBancoOnline in 'frmAtualizarBancoOnline.pas' {fAtualizarBancoOnline},
+  frmInfor in 'frmInfor.pas' {fInfor},
+  frmConsulta in 'frmConsulta.pas' {fConsulta},
+  frmPremios in 'frmPremios.pas' {fPremios};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(Tdm, dm);
+  Application.CreateForm(TfPrincipal, fPrincipal);
+  Application.CreateForm(TfLogin, fLogin);
+  Application.CreateForm(TfProcessamentoArquivo, fProcessamentoArquivo);
+  Application.CreateForm(TfClientes, fClientes);
+  Application.CreateForm(TfMilhar, fMilhar);
+  Application.CreateForm(TfVendedores, fVendedores);
+  Application.CreateForm(TfAtualizarBancoOnline, fAtualizarBancoOnline);
+  Application.CreateForm(TfInfor, fInfor);
+  Application.CreateForm(TfConsulta, fConsulta);
+  Application.CreateForm(TfPremios, fPremios);
+  Application.Run;
+end.

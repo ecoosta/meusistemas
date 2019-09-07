@@ -1,0 +1,131 @@
+unit frmClientes;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, DB, ZAbstractRODataset, ZAbstractDataset, ZDataset, StdCtrls, Grids,
+  DBGrids;
+
+type
+  TfClientes = class(TForm)
+    cbVendedores: TComboBox;
+    Label2: TLabel;
+    Label8: TLabel;
+    Label6: TLabel;
+    txtCliente: TEdit;
+    gClientes: TDBGrid;
+    btnExcluirCliente: TButton;
+    btnEditaCliente: TButton;
+    btnNovoCliente: TButton;
+    Label7: TLabel;
+    txtTotalMilhar: TEdit;
+    btnCancelarCliente: TButton;
+    btnSalvaCliente: TButton;
+    carregarClientes: TZQuery;
+    dsClientes: TDataSource;
+    carregarLogin: TZQuery;
+    procedure FormActivate(Sender: TObject);
+    procedure btnEditaClienteClick(Sender: TObject);
+    procedure btnExcluirClienteClick(Sender: TObject);
+    procedure btnNovoClienteClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  fClientes: TfClientes;
+
+implementation
+
+uses frmPrincipal;
+
+{$R *.dfm}
+
+procedure TfClientes.btnEditaClienteClick(Sender: TObject);
+begin
+
+    btnSalvaCliente.Enabled := true;
+    btnCancelarCliente.Enabled := true;
+    btnNovoCliente.Enabled := false;
+    gClientes.Enabled := false;
+    btnExcluirCliente.Enabled := false;
+    cbVendedores.Enabled := true;
+
+    txtCliente.Enabled := true;
+    txtTotalMilhar.Enabled := true;
+    txtCliente.SetFocus;
+    acao := 2; // 1 = INSERT 2 = UPDATE
+end;
+
+procedure TfClientes.btnExcluirClienteClick(Sender: TObject);
+var
+excluirDados, updateDados: TZQuery;
+begin
+    excluirDados := TZQuery.Create(nil);
+    updateDados := TZQuery.Create(nil);
+  if MessageDlg( 'Você realmente deseja excluir este cliente?', mtInformation, [mbNo,mbYes], 0 ) <> mrYes then begin
+      Abort;
+  end;
+
+  updateDados.SQL.Clear;
+  updateDados.Close;
+  updateDados.Connection := conexao;
+  updateDados.SQL.Add('UPDATE '+carregarClientes.FieldByName('TABELA').AsString+' SET CLIENTEID = "0" WHERE CLIENTEID = "'+carregarClientes.FieldByName('IDCLIENTE').AsString+'"');
+  updateDados.ExecSQL;
+
+  excluirDados.SQL.Clear;
+  excluirDados.Close;
+  excluirDados.Connection := conexao;
+  excluirDados.SQL.Add('DELETE FROM clientes WHERE IDCLIENTE = "'+carregarClientes.FieldByName('IDCLIENTE').AsString+'"');
+  excluirDados.ExecSQL;
+
+  carregarClientes.Active := True;
+  carregarClientes.Refresh;
+
+  Application.MessageBox('Dados Excluido com sucesso!', 'SKY PAINEL',MB_OK + MB_ICONWARNING);
+
+end;
+
+procedure TfClientes.btnNovoClienteClick(Sender: TObject);
+begin
+    gClientes.Enabled := false;
+    btnSalvaCliente.Enabled := true;
+    btnNovoCliente.Enabled := false;
+    gClientes.Enabled := false;
+    btnCancelarCliente.Enabled := true;
+    btnExcluirCliente.Enabled := false;
+    btnEditaCliente.Enabled := false;
+    cbVendedores.ItemIndex := cbVendedores.Items.IndexOf('');
+    cbVendedores.Enabled := true;
+
+    txtCliente.Enabled := true;
+    txtTotalMilhar.Enabled := true;
+    txtCliente.SetFocus;
+    txtCliente.Text := '';
+    txtTotalMilhar.Text := '';
+
+    acao := 1; // 1 = INSERT 2 = UPDATE
+end;
+
+procedure TfClientes.FormActivate(Sender: TObject);
+var
+item_combo:string;
+begin
+  with carregarLogin do
+  begin
+    Open;
+    while not Eof do
+    begin
+        item_combo := FieldByName('idlogin').AsString + ' - ' + FieldByName('nome').AsString;
+        cbVendedores.Items.AddObject(item_combo, TObject(FieldByName('idlogin').AsInteger));
+      Next;
+    end;
+  end;
+  carregarClientes.Active := True;
+  acao := 0;
+end;
+
+end.

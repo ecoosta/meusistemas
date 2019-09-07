@@ -1,0 +1,205 @@
+object fConfiguracoes: TfConfiguracoes
+  Left = 0
+  Top = 0
+  BorderStyle = bsToolWindow
+  Caption = 'Configura'#231#245'es FTP - SKY PAINEL SISTEMAS'
+  ClientHeight = 335
+  ClientWidth = 529
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label2: TLabel
+    Left = 8
+    Top = 10
+    Width = 65
+    Height = 19
+    Caption = 'Servidor:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label4: TLabel
+    Left = 8
+    Top = 77
+    Width = 129
+    Height = 19
+    Caption = 'Nome de Usuario:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label5: TLabel
+    Left = 8
+    Top = 142
+    Width = 49
+    Height = 19
+    Caption = 'Senha:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label1: TLabel
+    Left = 423
+    Top = 10
+    Width = 43
+    Height = 19
+    Caption = 'Porta:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label3: TLabel
+    Left = 8
+    Top = 213
+    Width = 99
+    Height = 19
+    Caption = 'Pasta remoto:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object Label6: TLabel
+    Left = 264
+    Top = 213
+    Width = 84
+    Height = 19
+    Caption = 'Pasta Local:'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
+  object txtServidor: TEdit
+    Left = 8
+    Top = 35
+    Width = 409
+    Height = 33
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 0
+    Text = 'ftp.devsky.provisorio.ws'
+  end
+  object txtUsuario: TEdit
+    Left = 8
+    Top = 102
+    Width = 511
+    Height = 33
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 1
+    Text = 'devsky'
+  end
+  object txtSenha: TEdit
+    Left = 8
+    Top = 167
+    Width = 511
+    Height = 33
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    PasswordChar = '*'
+    TabOrder = 2
+    Text = 'E182689ed@'
+  end
+  object btnConnectar: TButton
+    Left = 282
+    Top = 294
+    Width = 239
+    Height = 33
+    Cursor = crHandPoint
+    Caption = 'Salva Configura'#231#245'es'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 3
+    OnClick = btnConnectarClick
+  end
+  object txtPorta: TEdit
+    Left = 423
+    Top = 35
+    Width = 96
+    Height = 33
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 4
+    Text = '21'
+  end
+  object btnDirLocal: TButton
+    Left = 8
+    Top = 294
+    Width = 129
+    Height = 33
+    Caption = 'Selecionar pasta Local'
+    TabOrder = 5
+    OnClick = btnDirLocalClick
+  end
+  object txtPastaRemoto: TEdit
+    Left = 8
+    Top = 238
+    Width = 233
+    Height = 33
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 6
+  end
+  object txtPastaLocal: TEdit
+    Left = 264
+    Top = 238
+    Width = 255
+    Height = 33
+    Enabled = False
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    TabOrder = 7
+  end
+end

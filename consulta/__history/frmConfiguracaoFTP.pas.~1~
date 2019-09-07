@@ -1,0 +1,116 @@
+unit frmConfiguracaoFTP;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, IniFiles, Filectrl, IdBaseComponent, IdComponent, IdTCPConnection, IdTCPClient,
+  IdExplicitTLSClientServerBase, IdFTP;
+
+type
+  TfConfiguracoes = class(TForm)
+    txtServidor: TEdit;
+    Label2: TLabel;
+    Label4: TLabel;
+    txtUsuario: TEdit;
+    Label5: TLabel;
+    txtSenha: TEdit;
+    btnConnectar: TButton;
+    txtPorta: TEdit;
+    Label1: TLabel;
+    btnDirLocal: TButton;
+    txtPastaRemoto: TEdit;
+    Label3: TLabel;
+    Label6: TLabel;
+    txtPastaLocal: TEdit;
+    procedure btnConnectarClick(Sender: TObject);
+    procedure btnDirLocalClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    arConfig: TIniFile;
+  end;
+
+var
+  fConfiguracoes: TfConfiguracoes;
+
+implementation
+
+uses frmFTPMain;
+
+{$R *.dfm}
+
+procedure TfConfiguracoes.btnConnectarClick(Sender: TObject);
+var
+  Dir, porta: string;
+begin
+  Dir := ExtractFilePath(Application.ExeName);
+
+  if (txtServidor.Text = '') then begin
+     Application.MessageBox('Nao foi possivel analisar o endereco do servidor:'+#13+'Host nao especificiado, entre com um host.', 'SKY PAINEL - ERRO DE SINTAXE', MB_OK + 16);
+     txtServidor.SetFocus;
+     Abort;
+  end;
+
+  if (txtUsuario.Text = '') then begin
+     Application.MessageBox('Informe o nome do usuario do servidor FTP', 'SKY PAINEL - ERRO DE SINTAXE', MB_OK + 16);
+     txtUsuario.SetFocus;
+     Abort;
+  end;
+
+  if (txtSenha.Text = '') then begin
+     Application.MessageBox('Informe a senha do usuario do servidor FTP', 'SKY PAINEL - ERRO DE SINTAXE', MB_OK + 16);
+     txtSenha.SetFocus;
+     Abort;
+  end;
+
+  if (txtPorta.Text = '') then begin
+     Application.MessageBox('Porta foi definida automatico pelo sistema.', 'SKY PAINEL - NOTIFICACAO', MB_OK + 64);
+     txtSenha.Text := '21';
+  end;
+
+  if (txtPastaRemoto.Text = '') then begin
+     Application.MessageBox('Informe o nome da pasta remoto para conexao do FTP', 'SKY PAINEL - ERRO DE SINTAXE', MB_OK + 16);
+     txtPastaRemoto.SetFocus;
+     Abort;
+  end;
+
+  if (txtPastaLocal.Text = '') then begin
+     Application.MessageBox('Selecione um pasta local para inicilizacao do FTP', 'SKY PAINEL - ERRO DE SINTAXE', MB_OK + 16);
+     btnDirLocal.Click;
+     Abort;
+  end;
+  arConfig := TIniFile.Create(Dir + 'config.ini');
+  try
+    with arConfig do
+    begin
+      WriteString('CONFIG', 'SERVIDOR', txtServidor.Text);
+      WriteString('CONFIG', 'USUARIO', txtUsuario.Text);
+      WriteString('CONFIG', 'PASSWORD', txtSenha.Text);
+      WriteString('CONFIG', 'PORTA', txtPorta.Text);
+      WriteString('CONFIG', 'PASTAREMOTO', txtPastaRemoto.Text);
+      WriteString('CONFIG', 'PASTALOCAL', txtPastaLocal.Text);
+      Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      Application.MessageBox('Erro na conexão!', 'SKY PAINEL', MB_OK + 16);
+      abort;
+    end;
+  end;
+  Application.MessageBox('Dados salvos com sucesso e conexao etabeleciada com sucesso!', 'SKY PAINEL - NOTIFICACAO', MB_OK + 64);
+end;
+
+procedure TfConfiguracoes.btnDirLocalClick(Sender: TObject);
+var
+  sr: TSearchRec;
+  cont: Integer;
+  Dir: string;
+begin
+  SelectDirectory('Selecione uma pasta', 'E:\', Dir);
+  txtPastaLocal.Text := Dir+'\';
+end;
+
+end.

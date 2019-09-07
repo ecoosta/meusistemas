@@ -1,0 +1,550 @@
+unit frmMilhar;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, StdCtrls, Grids, DBGrids, DB, ZAbstractRODataset, ZAbstractDataset,
+  ZDataset;
+
+type
+  TfMilhar = class(TForm)
+    Label9: TLabel;
+    cbVendedoresM: TComboBox;
+    Label10: TLabel;
+    cbClientesM: TComboBox;
+    txtTabela: TEdit;
+    gMilhar: TDBGrid;
+    carregarLoginCB: TZQuery;
+    gTipo: TGroupBox;
+    rIncluir: TRadioButton;
+    rExcluir: TRadioButton;
+    grMilhar: TGroupBox;
+    lblMilharMSG: TLabel;
+    txtMilhar: TEdit;
+    Label12: TLabel;
+    txtTMilhar: TEdit;
+    Label14: TLabel;
+    btnImprimr: TButton;
+    Label1: TLabel;
+    grTotal: TGroupBox;
+    Label2: TLabel;
+    Label3: TLabel;
+    txtTotalMilharSortida: TEdit;
+    gTipo2: TGroupBox;
+    RadioButton1: TRadioButton;
+    RadioButton2: TRadioButton;
+    cTodas: TCheckBox;
+    gPremios: TDBGrid;
+    procedure cbClientesMChange(Sender: TObject);
+    procedure btnNovoMilharClick(Sender: TObject);
+    procedure cbVendedoresMChange(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+
+    procedure queryInsert();
+    procedure queryInsertSortida();
+    procedure queryExcluir();
+    procedure queryExcluirTodas();
+    procedure btnSalvarMilharClick(Sender: TObject);
+    procedure txtMilharKeyPress(Sender: TObject; var Key: Char);
+    procedure txtMilharChange(Sender: TObject);
+    procedure rExcluirClick(Sender: TObject);
+    procedure rIncluirClick(Sender: TObject);
+    procedure btnImprimrClick(Sender: TObject);
+    procedure RadioButton2Click(Sender: TObject);
+    procedure txtTotalMilharSortidaChange(Sender: TObject);
+    procedure txtTotalMilharSortidaKeyPress(Sender: TObject; var Key: Char);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    funcao:boolean;
+  end;
+
+var
+  fMilhar: TfMilhar;
+
+implementation
+
+uses frmPrincipal, frmDM;
+
+{$R *.dfm}
+
+procedure TfMilhar.btnImprimrClick(Sender: TObject);
+begin
+  dm.RvProject1.ProjectFile := 'teste.rav';
+  dm.RvProject1.Execute;
+end;
+
+procedure TfMilhar.btnNovoMilharClick(Sender: TObject);
+var
+qrDados: TZQuery;
+id_cliente: integer;
+begin
+   if (cbClientesM.Text = '') then begin
+        Application.MessageBox('Informe um cliente, para iniciar um novo cadastro!', 'SKY PAINEL',MB_OK + MB_ICONWARNING);
+        abort;
+    end;
+
+    if MessageDlg( 'Você realmente deseja excluir as milhar pra este cliente?', mtInformation, [mbNo,mbYes], 0 ) <> mrYes then begin
+      Abort;
+    end;
+
+    id_cliente := Integer( cbClientesM.Items.Objects[cbClientesM.ItemIndex ] );  //Pega o id do registro selecionado no combox
+    qrDados := TZQuery.Create(nil);
+    with qrDados do begin
+      Connection := DM.conexao;
+      Connection.Connect;
+      SQL.Clear;
+      Close;
+      SQL.Add('UPDATE '+txtTabela.Text+' SET CLIENTEID = "1" WHERE CLIENTEID = "'+IntToStr(id_cliente)+'"');
+      ExecSQL;
+    end;
+    txtMilhar.Enabled := True;
+    Application.MessageBox('Milhar exlcuida com sucesso!'+#13+'Agora podemos iniciar uma nova milhar para o cliente escolhido', 'SKY PAINEL',MB_OK + MB_ICONWARNING);
+end;
+
+procedure TfMilhar.btnSalvarMilharClick(Sender: TObject);
+begin
+  queryInsert;
+end;
+
+procedure TfMilhar.cbClientesMChange(Sender: TObject);
+var
+qrClientes,qrCount:TZQuery;
+id_cliente:integer;
+begin
+
+    id_cliente := integer(cbClientesM.Items.Objects[cbClientesM.ItemIndex]);
+    with DM.carregarMilhar do begin
+      SQL.Clear;
+      Close;
+      SQL.Add('SELECT * FROM '+txtTabela.Text+' t INNER JOIN clientes c ON c.idcliente = t.CLIENTEid WHERE t.CLIENTEid = "'+IntToStr(id_cliente)+'"');
+      Open;
+    end;
+
+    qrClientes := TZQuery.Create(nil);
+    with qrClientes do begin
+      Connection := DM.conexao;
+      Connection.Connect;
+      SQL.Clear;
+      Close;
+      SQL.Add('SELECT * FROM clientes c WHERE c.IDCLIENTE = "'+IntToStr(id_cliente)+'"');
+      Open;
+    end;
+
+    txtTMilhar.Text := qrClientes.FieldByName('TOTAL_MILHAR').AsString;
+
+    DM.dsMilhar.DataSet := DM.carregarMilhar;
+    gMilhar.DataSource := DM.dsMilhar;
+
+    dm.mostrarMensageLabel('Total de Milhar cadastrada: '+IntToStr(DM.carregarMilhar.RecordCount),Label1);
+end;
+
+procedure TfMilhar.cbVendedoresMChange(Sender: TObject);
+var
+  tabelaClientes, tabelaVendedores, ListMilhar,ListPremios: TZQuery;
+  tClientes,id_vendedor: integer;
+  item_combo_cliente:string;
+begin
+
+  cbClientesM.Clear;
+
+  id_vendedor := Integer( cbVendedoresM.Items.Objects[cbVendedoresM.ItemIndex ] );  //Pega o id do registro selecionado no combox
+
+  tabelaVendedores := TZQuery.Create(nil);
+  ListMilhar := TZQuery.Create(nil);
+  ListPremios := TZQuery.Create(nil);
+
+  tabelaVendedores := TZQuery.Create(nil);
+  tabelaVendedores.Connection :=  DM.conexao;
+  tabelaVendedores.SQL.Clear;
+  tabelaVendedores.SQL.Add('SELECT * FROM login WHERE IDLOGIN = "' + IntToStr(id_vendedor)+ '"');
+  tabelaVendedores.Close;
+  tabelaVendedores.Open;
+
+  txtTabela.Text := tabelaVendedores.FieldByName('tabela').AsString;
+  // mostra todos registro do vendedor selecionado
+  with ListMilhar do begin
+    Connection :=  DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM ');
+    SQL.Add(tabelaVendedores.FieldByName('tabela').AsString+' t');
+    SQL.Add(' INNER JOIN clientes c ON c.idcliente = ');
+    SQL.Add('t.CLIENTEID');
+    Close;
+    Open;
+  end;
+  DM.dsMilhar.DataSet := ListMilhar;
+  gMilhar.DataSource := DM.dsMilhar;
+
+  with ListPremios do begin
+    Connection :=  DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('SELECT * FROM premios p');
+    SQL.Add('INNER JOIN login l ON l.idlogin = p.vendedorid');
+    SQL.Add('where vendedorid = "'+IntToStr(id_vendedor)+'"');
+    SQL.Add('ORDER BY ID DESC');
+    Close;
+    Open;
+  end;
+  DM.dsPremios.DataSet := ListPremios;
+  gPremios.DataSource := DM.dsPremios;
+
+  //e seleciono o cliente no combobox apos acha-lo
+  if (tabelaVendedores.RecordCount > 0) then begin
+
+    tabelaClientes := TZQuery.Create(nil);
+    with tabelaClientes do begin
+      Connection := DM.conexao;
+      Connection.Connect;
+      SQL.Clear;
+      Close;
+      SQL.Add('SELECT * FROM clientes c WHERE VENDEDORID IN (' + tabelaVendedores.FieldByName('IDLOGIN').AsString+')');
+      Close;
+      Open;
+
+      while not Eof do
+      begin
+          item_combo_cliente := FieldByName('idcliente').AsString + ' - ' + FieldByName('nome_cliente').AsString;
+          cbClientesM.Items.AddObject(item_combo_cliente, TObject(FieldByName('idcliente').AsInteger));
+        Next;
+      end;
+    end;
+
+    tClientes := tabelaClientes.RecordCount;
+    
+  end
+  else
+  begin
+    cbClientesM.TextHint := 'Cliente não encontrado.';
+    cbClientesM.ItemIndex := cbClientesM.Items.IndexOf('');
+    abort;
+  end;
+
+end;
+
+
+
+procedure TfMilhar.FormActivate(Sender: TObject);
+var
+item_combo: string;
+begin
+  with carregarLoginCB do
+  begin
+  close;
+    Open;
+    while not Eof do
+    begin
+        item_combo := FieldByName('IDLOGIN').AsString + ' - ' + FieldByName('NOME').AsString;
+        cbVendedoresM.Items.AddObject(item_combo, TObject(FieldByName('IDLOGIN').AsInteger));
+      Next;
+    end;
+  end;
+  funcao := true;
+
+end;
+
+procedure TfMilhar.queryExcluir;
+var
+  qrExcluir,qrSQL: TZQuery;
+  id_cliente:integer;
+begin
+  qrExcluir := TZQuery.Create(nil);
+  qrSQL := TZQuery.Create(nil);
+  id_cliente := Integer( cbClientesM.Items.Objects[cbClientesM.ItemIndex ] );  //Pega o id do registro selecionado no combox
+    with qrSQL do begin
+       Connection := DM.conexao;
+       Connection.Connect;
+       SQL.Clear;
+       Close;
+       SQL.Add('SELECT * FROM '+txtTabela.Text+' WHERE CLIENTEID = '+IntToStr(id_cliente)+' AND milhar = :m');
+       ParamByName('m').AsString := txtMilhar.Text;
+       Open;
+    end;
+
+  if (qrSQL.RecordCount = 0) then begin
+    MessageBox(fMilhar.Handle, PChar('Milhar nao encontrada'),PChar('SKY PAINEL'), MB_OK + MB_ICONWARNING);
+    txtMilhar.Text := '';
+    txtMilhar.SetFocus;
+    Abort;
+  end;
+  with qrExcluir do
+  begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('UPDATE ' + txtTabela.Text +' SET CLIENTEID = :IDC WHERE milhar = :MID');
+    ParamByName('IDC').AsInteger := 1;
+    ParamByName('MID').AsString := txtMilhar.Text;
+    ExecSQL;
+  end;
+  txtMilhar.Text := '';
+  txtMilhar.SetFocus;
+  DM.dsMilhar.DataSet := DM.carregarMilhar;
+  gMilhar.DataSource := DM.dsMilhar;
+  lblMilharMSG.Visible := true;
+  DM.carregarMilhar.Refresh;
+  DM.mostrarMensageLabel('Milhar excluida com sucesso',lblMilharMSG)
+end;
+
+procedure TfMilhar.queryExcluirTodas;
+var
+  qrExcluir,qrSQL: TZQuery;
+  id_cliente:integer;
+begin
+  qrExcluir := TZQuery.Create(nil);
+  qrSQL := TZQuery.Create(nil);
+  id_cliente := Integer( cbClientesM.Items.Objects[cbClientesM.ItemIndex ] );  //Pega o id do registro selecionado no combox
+
+  with qrExcluir do
+  begin
+    Connection := DM.conexao;
+    Connection.Connect;
+    SQL.Clear;
+    Close;
+    SQL.Add('UPDATE ' + txtTabela.Text +' SET CLIENTEID = :IDC WHERE CLIENTEID = :IDCs');
+    ParamByName('IDC').AsInteger := 1;
+    ParamByName('IDCs').AsInteger := id_cliente;
+    ExecSQL;
+  end;
+  txtMilhar.Text := '';
+  txtMilhar.SetFocus;
+  DM.dsMilhar.DataSet := DM.carregarMilhar;
+  gMilhar.DataSource := DM.dsMilhar;
+  lblMilharMSG.Visible := true;
+  DM.carregarMilhar.Refresh;
+  DM.mostrarMensageLabel('Milhar excluidas com sucesso',lblMilharMSG)
+
+end;
+
+procedure TfMilhar.rExcluirClick(Sender: TObject);
+begin
+    if (cbClientesM.Text = '') then begin
+       Application.MessageBox('Selecione um cliente!','SKY PAINEL', MB_OK + MB_ICONWARNING);
+       rExcluir.Checked := False;
+       Abort;
+    end;
+    cTodas.Visible := true;
+
+    grTotal.Visible := false;
+    gTipo2.Visible := True;
+    txtMilhar.Enabled := True;
+    grMilhar.Visible := True;
+end;
+
+procedure TfMilhar.rIncluirClick(Sender: TObject);
+begin
+  if (cbClientesM.Text = '') then begin
+       Application.MessageBox('Selecione um cliente!','SKY PAINEL', MB_OK + MB_ICONWARNING);
+       rIncluir.Checked := False;
+       Abort;
+    end;
+    grTotal.Visible := false;
+    gTipo2.Visible := True;
+    txtMilhar.Enabled := True;
+    grMilhar.Visible := True;
+end;
+
+procedure TfMilhar.txtMilharChange(Sender: TObject);
+begin
+  lblMilharMSG.Visible := false;
+end;
+
+procedure TfMilhar.txtMilharKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then begin
+    if (rIncluir.Checked = True) then begin
+        queryInsert;
+    end else if (rExcluir.Checked = True) then begin
+      if (cTodas.Checked = True) then begin
+        queryExcluirTodas;
+      end else begin
+        queryExcluir;
+      end;
+    end;
+  end;
+end;
+
+procedure TfMilhar.txtTotalMilharSortidaChange(Sender: TObject);
+begin
+    lblMilharMSG.Visible := false;
+end;
+
+procedure TfMilhar.txtTotalMilharSortidaKeyPress(Sender: TObject;
+  var Key: Char);
+begin
+  if Key = #13 then begin
+      queryInsertSortida
+  end;
+end;
+
+procedure TfMilhar.queryInsert;
+var
+nUtimoControle, nProximoControle, nControleFinal,id_cliente: integer;
+qrValidar, updateSQL, qrSELECT, qrINSERT,qrMISELECIONADA, novaMilhar: TZQuery;
+begin
+
+  if ((cbClientesM.Text = '') OR (cbVendedoresM.Text = '')) then begin
+        Application.MessageBox('Selecione um Vendedor e um cliente para iniciar o cadastro!','SKY PAINEL', MB_OK + MB_ICONWARNING);
+    end;
+
+    if (txtMilhar.Text = '') then begin
+        Application.MessageBox('Informe a Milhar Escolhida pelo Cliente','SKY PAINEL', MB_OK + MB_ICONWARNING);
+        txtMilhar.SetFocus;
+        abort;
+    end;
+
+    id_cliente := Integer( cbClientesM.Items.Objects[cbClientesM.ItemIndex ] );  //Pega o id do registro selecionado no combox
+
+    qrINSERT := TZQuery.Create(nil);
+    qrValidar := TZQuery.Create(nil);
+
+    with qrValidar do begin
+       Connection := DM.conexao;
+       Connection.Connect;
+       SQL.Clear;
+       Close;
+       SQL.Add('SELECT * FROM '+txtTabela.Text+' WHERE CLIENTEID <> 1 AND milhar = :m');
+       ParamByName('m').AsString := txtMilhar.Text;
+       Open;
+    end;
+
+    if (qrValidar.RecordCount > 0) then begin
+         novaMilhar := TZQuery.Create(nil);
+          with novaMilhar do begin
+             Connection := DM.conexao;
+             Connection.Connect;
+             SQL.Clear;
+             Close;
+             SQL.Add('SELECT * FROM '+txtTabela.Text+' t INNER JOIN clientes ON clientes.idcliente = t.clienteid where milhar = :m');
+             ParamByName('m').AsString := txtMilhar.Text;
+             Open;
+          end;
+
+          if (MessageBox(Handle, PChar('Essa milhar já esta cadastra.'+#13+'Para: '+novaMilhar.FieldByName('nome_cliente').AsString+#13+'Voce deseja cadastra para o novo cliente? ('+cbClientesM.Text+')'), PChar('SKY PAINEL'), MB_YESNO or MB_ICONQUESTION) = 7) then begin
+              txtMilhar.Text := '';
+              txtMilhar.SetFocus;
+              abort;
+          end;
+
+            with qrINSERT do begin
+             Connection := DM.conexao;
+             Connection.Connect;
+                SQL.Clear;
+                Close;
+                SQL.Add('UPDATE '+txtTabela.Text+' SET MILHAR = :m, CLIENTEID = :IDC WHERE milhar = :MID');
+                ParamByName('IDC').AsInteger := id_cliente;
+                ParamByName('M').AsString := txtMilhar.Text;
+                ParamByName('MID').AsString := txtMilhar.Text;
+                ExecSQL;
+           end;
+            txtMilhar.Text := '';
+            DM.dsMilhar.DataSet := DM.carregarMilhar;
+            gMilhar.DataSource := DM.dsMilhar;
+            lblMilharMSG.Visible := true;
+            DM.carregarMilhar.Refresh;
+            //Application.MessageBox('Milhar gravada com sucesso', 'SKY PAINEL', MB_OK + MB_ICONWARNING);
+            lblMilharMSG.Caption :=  'Milhar cadastrada com sucesso';
+          txtMilhar.Text := '';
+          txtMilhar.SetFocus;
+        Abort;
+    end;
+    qrINSERT.Close;
+    qrMISELECIONADA := TZQuery.Create(nil);
+    with qrMISELECIONADA do begin
+       Connection := DM.conexao;
+       Connection.Connect;
+       SQL.Clear;
+       Close;
+       SQL.Add('SELECT * FROM '+txtTabela.Text+' WHERE milhar = :m AND CLIENTEID = :v');
+       ParamByName('m').AsString := txtMilhar.Text;
+       ParamByName('v').AsInteger := id_cliente;
+       Open;
+    end;
+
+    if (qrMISELECIONADA.RecordCount > 0) then begin
+        Application.MessageBox('Esta milhar que você digitou já esta cadastra, para este vendedor','SKY PAINEL', MB_OK + MB_ICONWARNING);
+        Abort;
+    end;
+
+     with qrINSERT do begin
+       Connection := DM.conexao;
+       Connection.Connect;
+          SQL.Clear;
+          Close;
+          SQL.Add('UPDATE '+txtTabela.Text+' SET MILHAR = :m, CLIENTEID = :IDC WHERE milhar = :MID');
+          ParamByName('IDC').AsInteger := id_cliente;
+          ParamByName('M').AsString := txtMilhar.Text;
+          ParamByName('MID').AsString := txtMilhar.Text;
+          ExecSQL;
+     end;
+      txtMilhar.Text := '';
+      DM.dsMilhar.DataSet := DM.carregarMilhar;
+      gMilhar.DataSource := DM.dsMilhar;
+      lblMilharMSG.Visible := true;
+      DM.carregarMilhar.Refresh;
+      //Application.MessageBox('Milhar gravada com sucesso', 'SKY PAINEL', MB_OK + MB_ICONWARNING);
+      lblMilharMSG.Caption :=  'Milhar cadastrada com sucesso';
+end;
+
+procedure TfMilhar.queryInsertSortida;
+var
+qrSobras,qrUpdate,qrSQL:TZQuery;
+i, j,nTotal,id_cliente:integer;
+begin
+    qrSobras := TZQuery.Create(nil);
+    qrUpdate := TZQuery.Create(nil);
+    qrSQL := TZQuery.Create(nil);
+    nTotal := StrToInt(txtTotalMilharSortida.Text);
+    id_cliente := Integer( cbClientesM.Items.Objects[cbClientesM.ItemIndex ] );  //Pega o id do registro selecionado no combox
+
+    with qrSobras do begin
+      Connection := DM.conexao;
+      Connection.Connect;
+      SQL.Clear;
+      SQL.Add('SELECT * FROM '+txtTabela.Text+' WHERE CLIENTEID = 1 ORDER BY ID ASC');
+      Open;
+
+      j := 1;
+      while not Eof do begin
+          with qrUpdate do begin
+            Connection := dm.conexao;
+            Connection.Connect;
+            SQL.Clear;
+            SQL.Add('UPDATE ' + txtTabela.Text +' SET CLIENTEID = :IDC WHERE ID = :ID');
+            ParamByName('id').AsInteger := qrSobras.FieldByName('ID').AsInteger;
+            ParamByName('IDC').AsInteger := id_cliente;
+            ExecSQL;
+          end;
+          qrUpdate.Close;
+          if (j = nTotal) then begin
+            Application.MessageBox('Milhar cadastrada!', 'SKY PAINEL', MB_OK + MB_ICONWARNING);
+            txtTotalMilharSortida.Text := '';
+            DM.dsMilhar.DataSet := DM.carregarMilhar;
+            gMilhar.DataSource := DM.dsMilhar;
+            lblMilharMSG.Visible := true;
+            //DM.carregarMilha.Refresh;
+            abort;
+          end;
+          j := j + 1;
+          Next;
+       end;
+    end;
+end;
+
+procedure TfMilhar.RadioButton2Click(Sender: TObject);
+begin
+    Application.MessageBox('E Necessario organizar a tabela pra fazer esse processamento.','SKY PAINEL', MB_OK + MB_ICONWARNING);
+    grMilhar.Visible := false;
+    grTotal.Visible := True;
+    grTotal.Left := 22;
+    grTotal.Top := 248;
+end;
+
+end.

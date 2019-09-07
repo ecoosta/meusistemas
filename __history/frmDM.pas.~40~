@@ -1,0 +1,135 @@
+unit frmDM;
+
+interface
+
+uses
+
+  SysUtils,
+  Windows, Messages, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, ComCtrls, Menus, StdCtrls,
+  DB, ZAbstractRODataset, ZAbstractDataset, ZDataset,
+  ZAbstractConnection, ZConnection, ADODB, RpCon, RpDefine, RpRave;
+
+type
+  Tdm = class(TDataModule)
+    Acesso: TZQuery;
+    Acessoid: TLongWordField;
+    AcessoNome: TWideStringField;
+    Acessologin: TWideStringField;
+    Acessosenha: TWideStringField;
+    Acessonivel: TLongWordField;
+    conexao: TZConnection;
+    qrSQL: TZQuery;
+    qrValidar: TZQuery;
+    carregarClientes: TZQuery;
+    carregarLogin: TZQuery;
+    dsAcesso: TDataSource;
+    dsClientes: TDataSource;
+    dsLogin: TDataSource;
+    arquivoDir: TOpenDialog;
+    qrProcessarArquivo: TZQuery;
+    dsProcessoArquivo: TDataSource;
+    carregarMilhar: TZQuery;
+    dsMilhar: TDataSource;
+    AcessoULTIMOACESSO: TDateTimeField;
+    conexaoRemoto: TZConnection;
+    consultapremio: TADOQuery;
+    consultaSQL: TADOQuery;
+    conexaoAcess: TADOConnection;
+    RvProject1: TRvProject;
+    RvCustomConnection1: TRvCustomConnection;
+    dsPremios: TDataSource;
+    carregarPremios: TZQuery;
+    procedure ConexaoDB;
+    procedure DataModuleCreate(Sender: TObject);
+    function mostrarMensageLabel(tString:String; labelform:TLabel) : String;
+    function querySQLCount(query:string):string;
+    procedure dsPremiosDataChange(Sender: TObject; Field: TField);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dm: Tdm;
+
+implementation
+
+uses frmVendedores, frmMilhar;
+
+{$R *.dfm}
+
+procedure Tdm.ConexaoDB;
+var
+tipo,
+cHost, cDatabase, cUsername, cPassword, cPorta, cDir, paramConfig, HostName,
+Database, username, Password, porta: string;
+begin
+  tipo := 'REMOTO';
+
+
+   // cabeçalho do arquivo ini
+  cHost     := 'HOST';
+  cDatabase := 'DATABASE2';
+  cUsername := 'USERNAME';
+  cPassword := 'PASSWORD';
+  cPorta    := 'PORTA';
+
+  try
+      with DM.conexaoRemoto do begin
+        HostName        :=   '162.241.203.232';
+        Database        :=   'skypai19_eudomar';
+        User            :=   'skypai19_ecosta';//arqIni.ReadString(tipo, cUsername, '');
+        Password        :=   '102030ed'; // arqIni.ReadString(tipo, cPassword, '');
+        Port            :=   3306;
+        Protocol        :=   'mysql';
+        LibraryLocation :=   'C:\libares\libmySQL.dll';
+      end;
+
+      DM.conexaoRemoto.Connected := true;
+
+  except
+      on e : exception do  begin
+         Application.MessageBox('Sem Conexão de Banco de Dados!','SKY PAINEL', MB_OK + MB_ICONWARNING);
+      end;
+  end;
+end;
+
+procedure Tdm.DataModuleCreate(Sender: TObject);
+begin
+ ConexaoDB;
+end;
+
+procedure Tdm.dsPremiosDataChange(Sender: TObject; Field: TField);
+begin
+    fMilhar.cbClientesM.Enabled := True;
+    fMilhar.gTipo.Visible := True;
+end;
+
+function Tdm.mostrarMensageLabel(tString: String; labelform: TLabel): String;
+begin
+   labelform.Visible := true;
+   labelform.Caption := tString;
+   labelform.Refresh;
+   labelform.Update;
+end;
+
+function Tdm.querySQLCount(query: string): string;
+ var
+ qrSQL: TZQuery;
+ begin
+   qrSQL := TZQuery.Create(nil);
+   with qrSQL do begin
+     Connection := conexao;
+     Connection.Connect;
+     SQL.Clear;
+     Close;
+     SQL.Add(query);
+     Close;
+     Open;
+   end;
+   result := inttostr(qrSQL.RecordCount);
+ end;
+
+end.

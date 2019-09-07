@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2019/07/29 20:57:05.831.pas,C:\Users\Edson Costa\Documents\RAD Studio\Projects\Unit1.pas=D:\bingo_v2\frmPrincipal.pas</Transaction>
+    <Transaction>2019/07/29 20:57:05.846.dfm,C:\Users\Edson Costa\Documents\RAD Studio\Projects\Unit1.dfm=D:\bingo_v2\frmPrincipal.dfm</Transaction>
+    <Transaction>2019/07/29 21:12:03.361.dproj,C:\Users\Edson Costa\Documents\RAD Studio\Projects\Project1.dproj=D:\bingo_v2\main.dproj</Transaction>
+    <Transaction>2019/08/01 14:58:06.856.pas,C:\bingo_v22\Unit1.pas=C:\bingo_v22\frmLogin.pas</Transaction>
+    <Transaction>2019/08/01 14:58:06.856.dfm,C:\bingo_v22\Unit1.dfm=C:\bingo_v22\frmLogin.dfm</Transaction>
+    <Transaction>2019/08/03 09:43:44.448.pas,C:\bingo_v22\Unit1.pas=C:\bingo_v22\frmDM.pas</Transaction>
+    <Transaction>2019/08/03 09:43:44.448.dfm,C:\bingo_v22\Unit1.dfm=C:\bingo_v22\frmDM.dfm</Transaction>
+  </Transactions>
+</BorlandProject>

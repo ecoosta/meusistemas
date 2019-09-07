@@ -1,0 +1,77 @@
+unit frmInfor;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, pngimage, ExtCtrls, StdCtrls, ZAbstractConnection, ZConnection, DB,
+  ZAbstractRODataset, ZAbstractDataset, ZDataset,inifiles,BASE;
+
+type
+  TfInfor = class(TForm)
+    Label1: TLabel;
+    Label3: TLabel;
+    Image3: TImage;
+    Label2: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    ZQuery1: TZQuery;
+    ZConnection1: TZConnection;
+    procedure Image3Click(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    aIni: TiniFile;
+  end;
+
+var
+  fInfor: TfInfor;
+
+implementation
+
+uses frmMain;
+
+{$R *.dfm}
+
+procedure TfInfor.FormActivate(Sender: TObject);
+var
+qrSerial: TZquery;
+serial, SerialDaMaquinaInstalado, serialOriginal, serialOrigem:string;
+dataAtual, dataVencimento: TDateTime;
+begin
+   aIni := TIniFile.Create('C:/materialsistema/config.ini');
+   serialOriginal :=  aIni.ReadString('GERAL', 'LICENCA', '');  //serial contratado pelo clientes
+
+   qrSerial := TZQuery.Create(nil);
+   with qrSerial do begin
+       Connection := fMain.conexaoLicenca;
+       Connection.Connect;
+       SQL.Clear;
+       SQL.Add('SELECT * FROM usuario_licenca WHERE serial ="'+serialOriginal+'"');
+       Close;
+       Open;
+   end;
+
+   Label5.Caption := qrSerial.FieldByName('nome_contratante').AsString;
+   Label6.Caption := qrSerial.FieldByName('dataCadastro').AsString;
+   Label10.Caption := qrSerial.FieldByName('Serial').AsString;
+   Label12.Caption := qrSerial.FieldByName('tipo').AsString;
+   Label8.Caption := qrSerial.FieldByName('codigo_contrato').AsString;
+end;
+
+procedure TfInfor.Image3Click(Sender: TObject);
+begin
+    fInfor.Close;
+end;
+
+end.
